@@ -13,10 +13,13 @@ Description: Perform a greedy search for a pathway through edge
 License: MIT + file LICENSE
 URL: https://github.com/dSHARP-CMU/pathfinder
 BugReports: https://github.com/dSHARP-CMU/pathfinder/issues
+Depends: 
+    igraph,
+    R (>= 3.0.1)
 Imports: 
+    assertthat,
     dequer,
     glue,
-    igraph,
     purrr,
     tibble
 Suggests: 
