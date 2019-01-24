@@ -24,9 +24,10 @@
 #' - `epath`: A list of integer vectors representing the successive edges crossed by the path
 #' - `vpath`: A list of integer vectors representing the sucessive vertices crossed by the path
 #' - `bpath`: A list of integer vectors representing the sucessive edge bundles crossed by the path
+#'
 #' @export
 greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, penalize = TRUE, quiet = !interactive()) {
-  ready_graph <- decorate_graph(graph)
+  ready_graph <- decorate_graph(graph, edge_bundles, distances)
   assert_that(is.count(starting_point))
   assert_that(starting_point %in% seq_len(vcount(ready_graph)), msg = "starting_point must be an index of a vertex in graph")
   assert_that(is.flag(penalize))
@@ -49,7 +50,7 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
     starting_point = starting_point,
     search_set = search_set,
     qe = qe, qv = qv, qb = qb,
-    is_bundle_crossing = TRUE,
+    is_bundle_crossing = is_edge_bundle,
     quiet = quiet)
 
   vpath = as.list(qv)
@@ -94,9 +95,11 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
 #' After this, it passes the newly reweighted graph and the new starting point to
 #' itself, and flips its mode. It will recurse until search_set is empty, or
 #' until it can find no further paths to take.
+#'
+#' @import igraph
 pathfind <- function(graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, quiet) {
 
-  crossed_bundles <- flatten_chr(as.list(qb))
+  crossed_bundles <- unlist(as.list(qb))
   search_set <- setdiff(search_set, starting_point)
 
   if (is_bundle_crossing) {
@@ -128,7 +131,7 @@ pathfind <- function(graph, starting_point, search_set, qe, qv, qb, is_bundle_cr
   candidate_distances <- distances(graph, v = starting_point, to = candidate_points, mode = "out",
                                    weights = edge_attr(graph, "distance"))
 
-  # If no path can be found, then return out
+  # If no path can be found, then return out with warning
   if (all(is.infinite(candidate_distances)))
     return(list(
       is_bundle_crossing = is_bundle_crossing,
