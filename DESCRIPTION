@@ -1,0 +1,28 @@
+Type: Package
+Package: pathfinder
+Title: Greedy Search For Graph Edge Bundles
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Matthew",
+           family = "Lincoln",
+           role = c("aut", "cre"),
+           email = "mlincoln@andrew.cmu.edu",
+           comment = c(ORCID = "0000-0002-4387-3384"))
+Description: Perform a greedy search for a pathway through edge
+    bundles in a graph.
+License: MIT + file LICENSE
+URL: https://github.com/dSHARP-CMU/pathfinder
+BugReports: https://github.com/dSHARP-CMU/pathfinder/issues
+Imports: 
+    dequer,
+    glue,
+    igraph,
+    purrr,
+    tibble
+Suggests: 
+    testthat
+Encoding: UTF-8
+Language: en-US
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 6.1.1
