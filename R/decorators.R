@@ -15,6 +15,7 @@ decorate_graph <- function(graph, edge_bundles, distances) {
 
   bundled_edges <- get_bundled_edges(edge_bundles)
 
+  edge_attr(graph, "pathfinder.edge_id") <- seq_len(ecount(graph))
   edge_attr(graph, "pathfinder.distance") <- distances
   edge_attr(graph, "pathfinder.required") <- FALSE
   edge_attr(graph, "pathfinder.required", index = bundled_edges) <- TRUE

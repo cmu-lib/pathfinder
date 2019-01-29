@@ -3,18 +3,6 @@ penalize <- function(x) {
   (x + 1000)^2
 }
 
-#' Status message per step
-step_status_message <- function(starting_point, search_set, is_bundle_crossing, bundle_id = NULL) {
-  starting <- str_glue("Starting from {starting_point}.")
-  points_left <- str_glue("{length(search_set)} candidate points left.")
-
-  if (is_bridge_crossing) {
-    str_glue("{starting} Crossing bundle {bundle_id}. {points_left}")
-  } else {
-    str_glue("{starting} Looking for next bundle. {points_left}")
-  }
-}
-
 get_bundled_edges <- function(edge_bundles) {
   res <- unlist(edge_bundles)
   bundle_ids <- unlist(mapply(rep, seq_along(edge_bundles), vapply(edge_bundles, length, FUN.VALUE = integer(1))))

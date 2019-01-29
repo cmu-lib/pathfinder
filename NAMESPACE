@@ -2,4 +2,6 @@
 
 export(greedy_search)
 import(assertthat)
+import(dequer)
+import(glue)
 import(igraph)

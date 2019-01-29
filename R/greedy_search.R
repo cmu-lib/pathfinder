@@ -13,7 +13,7 @@
 #'
 #' @param graph An [igraph::igraph] object.
 #' @param starting_point Integer. Index of the point from which to start the search.
-#' @param edge_bundles. A list of integer vectors. Each list item will be considered one edge bundle, and each vector the edge indices belonging to that bundle.
+#' @param edge_bundles A list of integer vectors. Each list item will be considered one edge bundle, and each vector the edge indices belonging to that bundle.
 #' @param distances Double. A vector of length `ecount(graph)` with the distances of each edge.
 #' @param penalize Boolean. Penalize the edge distance of already-crossed bundles to discourage crossing the same bundles more than once?
 #' @param quiet Boolean. Display progress?
@@ -96,7 +96,7 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
 #' itself, and flips its mode. It will recurse until search_set is empty, or
 #' until it can find no further paths to take.
 #'
-#' @import igraph
+#' @import igraph dequer
 pathfind <- function(graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, quiet) {
 
   crossed_bundles <- unlist(as.list(qb))
@@ -104,8 +104,8 @@ pathfind <- function(graph, starting_point, search_set, qe, qv, qb, is_bundle_cr
 
   if (is_bundle_crossing) {
     # Get first uncrossed bundle that goes from this node
-    bundle_id <- first(setdiff(na.omit(edge_attr(graph, "bundle_id", E(graph)[.from(starting_point)])), crossed_bundles))
-    candidate_edges <- which(edge_attr(graph, "bundle_id") == bundle_id)
+    bundle_id <- head(setdiff(na.omit(edge_attr(graph, "pathfinder.bundle_id", E(graph)[.from(starting_point)])), crossed_bundles), 1)
+    candidate_edges <- which(edge_attr(graph, "pathfinder.bundle_id") == bundle_id)
     # Collect the head/"to" nodes of all the bundle edges, since we will always
     # be starting at the tail/"from" node of a bundle edge
     candidate_points <- setdiff(unique(as.integer(head_of(graph, es = candidate_edges))), starting_point)
@@ -125,11 +125,11 @@ pathfind <- function(graph, starting_point, search_set, qe, qv, qb, is_bundle_cr
   }
 
   # Report on status
-  if (!quiet) message(step_status_message(starting_point, search_set, is_bundle_crossing, bundle_id))
+  step_status_message(quiet, starting_point, search_set, is_bundle_crossing)
 
   # Calculate possible distances
   candidate_distances <- distances(graph, v = starting_point, to = candidate_points, mode = "out",
-                                   weights = edge_attr(graph, "distance"))
+                                   weights = edge_attr(graph, "pathfinder.distance"))
 
   # If no path can be found, then return out with warning
   if (all(is.infinite(candidate_distances)))
@@ -145,48 +145,48 @@ pathfind <- function(graph, starting_point, search_set, qe, qv, qb, is_bundle_cr
     # Find a path within the subgraph comprising only that bundle
     bundle_graph <- subgraph.edges(graph, eids = candidate_edges, delete.vertices = FALSE)
     candidate_distances <- distances(bundle_graph, v = starting_point, to = candidate_points, mode = "out", weights = edge_attr(bundle_graph, "distance"))
-    ranking <- min_rank(candidate_distances)
+    ranking <- rank(candidate_distances, ties.method = "min")
     ranking[is.infinite(candidate_distances)] <- 0L
     target_point <- candidate_points[which.max(ranking)]
     suppressWarnings({
-      possible_paths <- shortest_paths(bundle_graph, from = starting_point, to = target_point, mode = "out", output = "both", weights = edge_attr(bundle_graph, "distance"))
+      possible_paths <- shortest_paths(bundle_graph, from = starting_point, to = target_point, mode = "out", output = "both", weights = edge_attr(bundle_graph, "pathfinder.distance"))
     })
   } else {
     target_point <- candidate_points[which.min(candidate_distances)]
     suppressWarnings({
       possible_paths <- shortest_paths(graph, from = starting_point, to = target_point,
-                                       weights = edge_attr(graph, "distance"), output = "both", mode = "out")
+                                       weights = edge_attr(graph, "pathfinder.distance"), output = "both", mode = "out")
     })
   }
 
-  epath <- possible_paths$epath[[1]]$.id
+  epath <- possible_paths$epath[[1]]$pathfinder.edge_id
   vpath <- as.integer(possible_paths$vpath[[1]])
 
   pushback(qe, epath)
   pushback(qv, vpath)
 
-  bundles_crossed <- na.omit(unique(edge_attr(graph, "bundle_id", index = epath)))
+  bundles_crossed <- na.omit(unique(edge_attr(graph, "pathfinder.bundle_id", index = epath)))
   if (length(bundles_crossed) > 0) {
     # Any bundles crossed get added to the queue
     pushback(qb, bundles_crossed)
-    message("bundles crossed: ", str_c(bundles_crossed, collapse = "; "))
+    message("bundles crossed: ", paste(bundles_crossed, collapse = "; "))
 
     bundle_edges <- which(edge_attr(graph, "bundle_id") %in% bundles_crossed)
     bundle_nodes <- as.integer(head_of(graph, es = bundle_edges))
 
-    message("increasing weights for ", str_c(bundle_edges, collapse = "; "))
+    message("increasing weights for ", paste(bundle_edges, collapse = "; "))
     edge_attr(graph, "distance", index = bundle_edges) <- penalize(edge_attr(graph, "distance", index = bundle_edges))
 
     # Remove all nodes on the crossed bundle from the remaining search set
     removed_nodes <- intersect(search_set, bundle_nodes)
-    message("removing nodes ", str_c(removed_nodes, collapse = "; "))
+    message("removing nodes ", paste(removed_nodes, collapse = "; "))
     search_set <- setdiff(search_set, bundle_nodes)
   }
 
   # Pass two items to the next search step:
   # 1) the final node of the vpath - this becomes the starting point for the next step
   # 2) the pruned search set that removes all the nodes from the bundle just considered
-  new_starting_point <- last(vpath)
+  new_starting_point <- tail(vpath, 1)
 
   # If all bundles have been reached, return out empty set
   if (length(search_set) <= 0) {
@@ -203,14 +203,12 @@ pathfind <- function(graph, starting_point, search_set, qe, qv, qb, is_bundle_cr
   # Force garbage collection before moving on
   gc(full = TRUE)
 
-  ignore( # To keep drake from reading this recursion as a cyclic dependency, we need to explicity ignore() this function call
-    locate_next_path(graph = graph,
-                     starting_point = new_starting_point,
-                     search_set = search_set,
-                     qe = qe, qv = qv, qb = qb,
-                     is_bundle_crossing = !is_bundle_crossing,
-                     quiet = quiet)
-  )
+  pathfind(graph = graph,
+                   starting_point = new_starting_point,
+                   search_set = search_set,
+                   qe = qe, qv = qv, qb = qb,
+                   is_bundle_crossing = !is_bundle_crossing,
+                   quiet = quiet)
 }
 
 

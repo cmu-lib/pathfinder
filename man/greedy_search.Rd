@@ -4,24 +4,29 @@
 \alias{greedy_search}
 \title{Greedy search for bundled edges}
 \usage{
-greedy_search(graph, starting_point = 1, edge_bundles,
-  quiet = !interactive(), distances, penalize = TRUE)
+greedy_search(graph, edge_bundles, distances, starting_point = 1,
+  penalize = TRUE, quiet = !interactive())
 }
 \arguments{
 \item{graph}{An \link[igraph:igraph]{igraph::igraph} object.}
 
-\item{starting_point}{Integer. Index of the point from which to start the search.}
-
-\item{quiet}{Boolean. Display progress?}
+\item{edge_bundles}{A list of integer vectors. Each list item will be considered one edge bundle, and each vector the edge indices belonging to that bundle.}
 
 \item{distances}{Double. A vector of length \code{ecount(graph)} with the distances of each edge.}
 
+\item{starting_point}{Integer. Index of the point from which to start the search.}
+
 \item{penalize}{Boolean. Penalize the edge distance of already-crossed bundles to discourage crossing the same bundles more than once?}
 
-\item{edge_bundles.}{A list of integer vectors. Each list item will be considered one edge bundle, and each vector the edge indices belonging to that bundle.}
+\item{quiet}{Boolean. Display progress?}
 }
 \value{
-An object
+A \code{pathfinder} object, which is a list with the following elements:
+\itemize{
+\item \code{epath}: A list of integer vectors representing the successive edges crossed by the path
+\item \code{vpath}: A list of integer vectors representing the sucessive vertices crossed by the path
+\item \code{bpath}: A list of integer vectors representing the sucessive edge bundles crossed by the path
+}
 }
 \description{
 This strategy uses a greedy search along the original graph. It will navigate

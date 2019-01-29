@@ -11,6 +11,8 @@ test_that("Decorators add graph attributes", {
 
   expect_equal(edge_attr(dg, "pathfinder.distance"), distances)
 
+  expect_equivalent(edge_attr(dg, "pathfinder.edge_id"), seq_len(ecount(graph)))
+
   expect_is(edge_attr(dg, "pathfinder.required"), "logical")
   expect_true(noNA(edge_attr(dg, "pathfinder.required")))
 
