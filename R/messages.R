@@ -11,7 +11,7 @@ message_end <- function(quiet, epath) {
 }
 
 #' @rdname quiet_messaging
-step_status_message <- function(quiet, starting_point, search_set, is_bundle_crossing, bundle_id = NULL) {
+step_status_message <- function(quiet, starting_point, search_set, is_bundle_crossing, bundle_id) {
   if (quiet) return(invisible())
 
   starting <- glue("Starting from {starting_point}.")

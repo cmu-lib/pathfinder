@@ -13,7 +13,7 @@
 message_end(quiet, epath)
 
 step_status_message(quiet, starting_point, search_set, is_bundle_crossing,
-  bundle_id = NULL)
+  bundle_id)
 
 message_increase(quiet, bundle_edges)
 

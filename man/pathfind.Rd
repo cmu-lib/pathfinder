@@ -4,8 +4,8 @@
 \alias{pathfind}
 \title{Pathfinding handler}
 \usage{
-pathfind(graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing,
-  quiet)
+pathfind(pathfinder_graph, starting_point, search_set, qe, qv, qb,
+  is_bundle_crossing, quiet)
 }
 \description{
 Primary recursive function that steps through the graph. This function has two
