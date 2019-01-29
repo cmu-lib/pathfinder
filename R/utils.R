@@ -1,6 +1,6 @@
 #' Edge weight penalty function
 penalize <- function(x) {
-  (x + 1000)^2
+  (x + 1000)^4
 }
 
 get_bundled_edges <- function(edge_bundles) {
@@ -29,4 +29,13 @@ get_interface_points <- function(graph, edge_bundles) {
 unique_pathway_edges <- function(pathway) {
   assert_that(inherits(pathway, "pathfinder_path"))
   unique(unlist(pathway$epath))
+}
+
+pathway_steps <- function(pathway) {
+  assert_that(inherits(pathway, "pathfinder_path"))
+  res <- vapply(pathway$vpath, function(x) head(x, 1), FUN.VALUE = integer(1))
+  tibble::tibble(
+    node_id = res,
+    step = seq_along(res)
+  )
 }
