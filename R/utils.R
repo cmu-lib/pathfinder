@@ -25,3 +25,8 @@ get_interface_points <- function(graph, edge_bundles) {
   res <- lapply(edge_bundles, function(x) get_bundle_interfaces(graph, x, get_bundled_edges(edge_bundles)))
   unlist(res)
 }
+
+unique_pathway_edges <- function(pathway) {
+  assert_that(inherits(pathway, "pathfinder_path"))
+  unique(unlist(pathway$epath))
+}

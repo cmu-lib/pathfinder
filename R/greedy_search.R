@@ -53,11 +53,11 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
     is_bundle_crossing = is_edge_bundle,
     quiet = quiet)
 
-  vpath = as.list(qv)
-  epath = as.list(qe)
-  bpath = as.list(qb)
+  vpath <- as.list(qv)
+  epath <- as.list(qe)
+  bpath <- as.list(qb)
 
-  results <- structure(
+  pathway <- structure(
     list(
       epath = epath,
       vpath = vpath,
@@ -67,8 +67,8 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
     ),
     class = "pathfinder_path")
 
-  message_end(quiet, epath)
-  return(results)
+  message_end(quiet, epath = pathway$epath)
+  return(pathway)
 }
 
 
@@ -118,7 +118,7 @@ pathfind <- function(graph, starting_point, search_set, qe, qv, qb, is_bundle_cr
   # tangent to another bundle and so it's not inherited both associated bundle
   # IDs. In this case, allow pathfinding to seek out the next closest bundle.
   if (length(candidate_points) == 0) {
-    message("no bundle candidates, looking for a new point")
+    message_none(quiet)
     is_bundle_crossing <- FALSE
     bundle_id <- NULL
     candidate_points <- search_set
@@ -169,17 +169,17 @@ pathfind <- function(graph, starting_point, search_set, qe, qv, qb, is_bundle_cr
   if (length(bundles_crossed) > 0) {
     # Any bundles crossed get added to the queue
     pushback(qb, bundles_crossed)
-    message("bundles crossed: ", paste(bundles_crossed, collapse = "; "))
+    message_crossed(quiet, bundles_crossed)
 
     bundle_edges <- which(edge_attr(graph, "bundle_id") %in% bundles_crossed)
     bundle_nodes <- as.integer(head_of(graph, es = bundle_edges))
 
-    message("increasing weights for ", paste(bundle_edges, collapse = "; "))
+    message_increase(quiet, bundle_edges)
     edge_attr(graph, "distance", index = bundle_edges) <- penalize(edge_attr(graph, "distance", index = bundle_edges))
 
     # Remove all nodes on the crossed bundle from the remaining search set
     removed_nodes <- intersect(search_set, bundle_nodes)
-    message("removing nodes ", paste(removed_nodes, collapse = "; "))
+    message_removed(quiet, removed_nodes)
     search_set <- setdiff(search_set, bundle_nodes)
   }
 
