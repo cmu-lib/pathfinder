@@ -109,7 +109,9 @@ pathfind <- function(pathfinder_graph, starting_point, search_set, q, qe, qv, qb
   search_set <- setdiff(search_set, starting_point)
 
   if (is_bundle_crossing) {
-    # Get first uncrossed bundle that goes from this node
+    # Get first uncrossed bundle that goes from this node. This logic is
+    # required when a potential node is tangent to two different bridge
+    # relations. It will cause the uncrossed relation to be favored.
     bundle_id <- head(setdiff(na.omit(edge_attr(pathfinder_graph, "pathfinder.bundle_id", E(pathfinder_graph)[.from(starting_point)])), crossed_bundles), 1)
     candidate_edges <- which(edge_attr(pathfinder_graph, "pathfinder.bundle_id") == bundle_id)
     # Collect the head/"to" nodes of all the bundle edges, since we will always
@@ -188,7 +190,7 @@ pathfind <- function(pathfinder_graph, starting_point, search_set, q, qe, qv, qb
     # ALL edges belonging to the bundle, whether they were actually crossed or
     # not, get penalized, and their nodes removed from the search list
     bundle_edges <- which(edge_attr(pathfinder_graph, "pathfinder.bundle_id") %in% bundles_crossed)
-    bundle_nodes <- as.integer(head_of(pathfinder_graph, es = bundle_edges))
+    bundle_nodes <- union(as.integer(head_of(pathfinder_graph, es = bundle_edges)), as.integer(tail_of(pathfinder_graph, es = bundle_edges)))
 
     message_increase(quiet, bundle_edges)
     edge_attr(pathfinder_graph, "pathfinder.distance", index = bundle_edges) <- penalize(edge_attr(pathfinder_graph, "pathfinder.distance", index = bundle_edges))
