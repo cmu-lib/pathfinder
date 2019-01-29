@@ -23,6 +23,7 @@ Imports:
     purrr,
     tibble
 Suggests: 
+    ggraph,
     testthat
 Encoding: UTF-8
 Language: en-US
