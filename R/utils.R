@@ -1,6 +1,6 @@
 #' Edge weight penalty function
 penalize <- function(x) {
-  (x + 1000)^4
+  (x + 1000)^2
 }
 
 get_bundled_edges <- function(edge_bundles) {
