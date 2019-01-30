@@ -4,7 +4,7 @@
 \alias{pathfind}
 \title{Pathfinding handler}
 \usage{
-pathfind(pathfinder_graph, starting_point, search_set, qe, qv, qb,
+pathfind(pathfinder_graph, starting_point, search_set, q, qe, qv, qb, qd,
   is_bundle_crossing, quiet)
 }
 \description{

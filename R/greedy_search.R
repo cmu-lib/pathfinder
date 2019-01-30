@@ -197,9 +197,9 @@ pathfind <- function(pathfinder_graph, starting_point, search_set, q, qe, qv, qb
 
     # Remove all nodes on the crossed bundle from the remaining search set
     removed_nodes <- intersect(search_set, bundle_nodes)
-    if (length(removed_nodes) > 1) {
-      message_removed(quiet, removed_nodes)
+    if (length(removed_nodes) > 0) {
       search_set <- setdiff(search_set, bundle_nodes)
+      message_removed(quiet, removed_nodes, search_set)
     }
   }
 

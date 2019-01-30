@@ -37,9 +37,9 @@ message_crossed <- function(quiet, bundles_crossed) {
 }
 
 #' @rdname quiet_messaging
-message_removed <- function(quiet, removed_nodes) {
+message_removed <- function(quiet, removed_nodes, search_set) {
   if (quiet) return(invisible())
-  message("removing nodes ", paste(removed_nodes, collapse = "; "))
+  message(glue("removing nodes {paste(removed_nodes, collapse = '; ')}; {length(search_set)} nodes remaining."))
 }
 
 #' @rdname quiet_messaging

@@ -21,7 +21,8 @@ Imports:
     dequer,
     glue,
     purrr,
-    tibble
+    tibble,
+    parallel
 Suggests: 
     ggraph,
     testthat
