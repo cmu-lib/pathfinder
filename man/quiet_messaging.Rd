@@ -19,7 +19,7 @@ message_increase(quiet, bundle_edges)
 
 message_crossed(quiet, bundles_crossed)
 
-message_removed(quiet, removed_nodes)
+message_removed(quiet, removed_nodes, search_set)
 
 message_none(quiet)
 }
