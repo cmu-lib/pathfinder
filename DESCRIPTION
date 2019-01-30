@@ -22,7 +22,7 @@ Imports:
     glue,
     purrr,
     tibble,
-    parallel
+    progress
 Suggests: 
     ggraph,
     testthat

@@ -22,7 +22,11 @@ get_bundle_interfaces <- function(graph, edge_bundle, bundled_edges) {
 }
 
 get_interface_points <- function(graph, edge_bundles) {
-  res <- parallel::parLapply(cl = cl, edge_bundles, function(x) get_bundle_interfaces(graph, x, get_bundled_edges(edge_bundles)))
+  pb <- progress::progress_bar$new(total = length(edge_bundles))
+  res <- lapply(edge_bundles, function(x) {
+    pb$tick()
+    get_bundle_interfaces(graph, x, get_bundled_edges(edge_bundles))
+    })
   unlist(res)
 }
 
