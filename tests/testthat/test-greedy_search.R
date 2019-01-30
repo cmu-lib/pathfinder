@@ -8,7 +8,7 @@ test_that("greedy_search checks inputs", {
 })
 
 test_that("greedy_search returns filled list", {
-  expect_message(pathway <- greedy_search(graph, edge_bundles, distances, starting_point = 1271, quiet = FALSE), regexp = "\\d", all = TRUE)
+  expect_message(pathway <- greedy_search(graph, edge_bundles, distances, starting_point = 1L, quiet = FALSE), regexp = "\\d", all = TRUE)
   expect_equivalent(pathway$starting_point, 1L)
   expect_equivalent(length(pathway$pathfinding_results$search_set), 0L)
   expect_gt(length(pathway$epath), 1L)

@@ -10,24 +10,12 @@ get_bundled_edges <- function(edge_bundles) {
   res
 }
 
-is_interface_vertex <- function(graph, vid, bundled_edges) {
-  incidence <- as.integer(incident(graph, vid)) %in% bundled_edges
-  any(incidence) & any(!incidence)
-}
-
-get_bundle_interfaces <- function(graph, edge_bundle, bundled_edges) {
-  all_vertices <- unique(as.integer(ends(graph, edge_bundle, names = FALSE)))
-  is_interface <- vapply(all_vertices, function(x) is_interface_vertex(graph, x, bundled_edges), FUN.VALUE = logical(1))
-  all_vertices[is_interface]
-}
-
-get_interface_points <- function(graph, edge_bundles) {
-  pb <- progress::progress_bar$new(total = length(edge_bundles))
-  res <- lapply(edge_bundles, function(x) {
-    pb$tick()
-    get_bundle_interfaces(graph, x, get_bundled_edges(edge_bundles))
-    })
-  unlist(res)
+get_interface_points <- function(graph, bundled_edges) {
+  non_bundled_edges <- setdiff(seq_len(ecount(graph)), bundled_edges)
+  bundle_tangent <- unique(as.integer(ends(graph, es = bundled_edges, names = FALSE)))
+  non_bundle_tangent <- unique(as.integer(ends(graph, es = non_bundled_edges, names = FALSE)))
+  both_tangent <- intersect(bundle_tangent, non_bundle_tangent)
+  both_tangent
 }
 
 unique_pathway_edges <- function(pathway) {
