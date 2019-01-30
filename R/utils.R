@@ -3,6 +3,7 @@ penalize <- function(x) {
   (x + 1000)^2
 }
 
+#' @export
 get_bundled_edges <- function(edge_bundles) {
   res <- unlist(edge_bundles)
   bundle_ids <- unlist(mapply(rep, seq_along(edge_bundles), vapply(edge_bundles, length, FUN.VALUE = integer(1))))
@@ -10,6 +11,7 @@ get_bundled_edges <- function(edge_bundles) {
   res
 }
 
+#' @export
 get_interface_points <- function(graph, bundled_edges) {
   non_bundled_edges <- setdiff(seq_len(ecount(graph)), bundled_edges)
   bundle_tangent <- unique(as.integer(ends(graph, es = bundled_edges, names = FALSE)))
