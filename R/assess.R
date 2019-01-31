@@ -13,13 +13,15 @@
 #'
 #' @export
 glance <- function(pathway) {
+  assertthat::assert_that(inherits(pathway, "pathfinder_path"))
+
   starting_point <- pathway$starting_point
-  ending_point <- pathway$pathfinding_results$point
+  ending_point <- pathway$ending_point
   n_steps <- length(pathway$epath)
   edge_itinerary <- unlist(pathway$epath)
   bundle_itinterary <- unlist(pathway$bpath)
 
-  total_distance <- sum(distances[edge_itinerary])
+  total_distance <- sum(pathway$distances[edge_itinerary])
   times_bundles_crossed <- bundle_cross_count(pathway$bpath)
 
   max_times_crossed <- max(times_bundles_crossed$n)
@@ -45,6 +47,8 @@ glance <- function(pathway) {
 #'   - `bundle_id`
 #'   - `times_crossed`
 tidy <- function(pathway) {
+  assertthat::assert_that(inherits(pathway, "pathfinder_path"))
+
   bundle_cross_count(pathway$bpath)
 }
 
@@ -63,10 +67,10 @@ tidy <- function(pathway) {
 #' @import magrittr
 #' @export
 augment <- function(pathway) {
+  assertthat::assert_that(inherits(pathway, "pathfinder_path"))
   suppressPackageStartupMessages({
     assertthat::assert_that(require(dplyr), msg = "augment() requires dplyr")
   })
-
 
   all_edges <- unlist(pathway$epath)
   step_id <- unlist(mapply(function(e, i) rep(i, times = length(e)), pathway$epath, seq_along(pathway$epath)))
@@ -80,9 +84,7 @@ augment <- function(pathway) {
     index,
     step_id,
     edge_id,
-    bundle_id)
-
-  res %>%
+    bundle_id) %>%
     mutate(
       # True for any step that crosses onto a bridge from either a non-bridge or a different bridge
       bundle_switch = !is.na(bundle_id) & (is.na(lag(bundle_id)) | (lag(bundle_id) != bundle_id))) %>%
@@ -92,11 +94,13 @@ augment <- function(pathway) {
     mutate(times_bundle_crossed = cumsum(bundle_switch)) %>%
     ungroup() %>%
     select(-bundle_switch)
+
+  return(res)
 }
 
 bundle_cross_count <- function(bpath) {
   res <- tibble::enframe(table(unlist(bpath)), name = "bundle_id", value = "n")
-  res$bundle.id <- as.integer(as.character(res$bundle.id))
+  res$bundle_id <- as.integer(as.character(res$bundle_id))
   res$n <- as.integer(res$n)
   res
 }

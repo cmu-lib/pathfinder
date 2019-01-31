@@ -59,7 +59,6 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
   vpath <- as.list(qv)
   epath <- as.list(qe)
   bpath <- as.list(qb)
-  distances = as.list(qd)
 
   pathway <- structure(
     list(

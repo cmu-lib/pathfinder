@@ -11,7 +11,7 @@ test_that("Edge bundles", {
 })
 
 test_that("Interface vertices are detected", {
-  ip1 <- get_interface_points(graph, bundled_edges)
+  ip1 <- get_interface_points(graph, edge_bundles)
   expect_equal(ip1, c(585L, 1156L, 885L, 1271L, 1144L, 1152L, 1158L, 1159L, 1160L,
                       1269L, 1247L, 1265L, 1545L, 1546L, 1537L, 1526L))
 })

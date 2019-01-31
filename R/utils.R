@@ -12,7 +12,8 @@ get_bundled_edges <- function(edge_bundles) {
 }
 
 #' @export
-get_interface_points <- function(graph, bundled_edges) {
+get_interface_points <- function(graph, edge_bundles) {
+  bundled_edges <- get_bundled_edges(edge_bundles)
   non_bundled_edges <- setdiff(seq_len(ecount(graph)), bundled_edges)
   bundle_tangent <- unique(as.integer(ends(graph, es = bundled_edges, names = FALSE)))
   non_bundle_tangent <- unique(as.integer(ends(graph, es = non_bundled_edges, names = FALSE)))

@@ -23,7 +23,7 @@ decorate_graph <- function(graph, edge_bundles, distances) {
   edge_attr(graph, "pathfinder.bundle_id", index = bundled_edges) <- attr(bundled_edges, "pathfinder.bundle_ids")
 
   vertex_attr(graph, "pathfinder.interface") <- FALSE
-  vertex_attr(graph, "pathfinder.interface", index = get_interface_points(graph, bundled_edges)) <- TRUE
+  vertex_attr(graph, "pathfinder.interface", index = get_interface_points(graph, edge_bundles)) <- TRUE
 
   graph
 }
