@@ -6,7 +6,7 @@
 \title{Pitsburgh bridge bundles}
 \format{A list of edge index vectors from \link{pgh_graph}.}
 \source{
-\href{https://www.openstreetmap.org}{OpenStreetMap}, available under the Open Database License, © OpenStreetMap contributors).
+\href{https://www.openstreetmap.org}{OpenStreetMap}, available under the Open Database License, © OpenStreetMap contributors.
 }
 \usage{
 pgh_bundles

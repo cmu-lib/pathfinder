@@ -6,7 +6,7 @@
 \title{Pitsburgh edge distances}
 \format{A numeric vector of edge distances for \link{pgh_graph} in meters.}
 \source{
-\href{https://www.openstreetmap.org}{OpenStreetMap}, available under the Open Database License, © OpenStreetMap contributors).
+\href{https://www.openstreetmap.org}{OpenStreetMap}, available under the Open Database License, © OpenStreetMap contributors.
 }
 \usage{
 pgh_distances

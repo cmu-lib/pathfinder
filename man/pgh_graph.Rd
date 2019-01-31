@@ -6,7 +6,7 @@
 \title{Pitsburgh road network}
 \format{An \link[igraph:igraph]{igraph::igraph} object containing a sample of street network data from Pittsburgh.}
 \source{
-\href{https://www.openstreetmap.org}{OpenStreetMap}, available under the Open Database License, © OpenStreetMap contributors).
+\href{https://www.openstreetmap.org}{OpenStreetMap}, available under the Open Database License, © OpenStreetMap contributors.
 }
 \usage{
 pgh_graph

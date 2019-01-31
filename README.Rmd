@@ -33,6 +33,8 @@ devtools::install_github("dSHARP-CMU/pathfinder")
 Starting with an igraph object, specify edge bundles that must be traversed by using a list of edge indices:
 
 ```{r}
+library(pathfinder)
+
 # A small subset of road data from Pittsburgh
 pgh_graph
 
@@ -46,8 +48,11 @@ pgh_bundles
 By setting `penalize = TRUE` you can add a sever edge weight penalty to crossed bundles to disincentivize crossing bundles more than once.
 
 ```{r}
-unpenalized_run <- greedy_search(graph, edge_bundles = bundles, distances = edge_distances)
-
+penalized_run <- greedy_search(pgh_graph, edge_bundles = pgh_bundles, distances = pgh_distances)
 ```
 
 ```{r}
+glance(penalized_run)
+tidy(penalized_run)
+augment(penalized_run)
+```

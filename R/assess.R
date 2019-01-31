@@ -49,6 +49,8 @@ glance <- function(pathway) {
 #' @return A [tibble::tibble] with the following columns
 #'   - `bundle_id`
 #'   - `times_crossed`
+#'
+#' @export
 tidy <- function(pathway) {
   assertthat::assert_that(inherits(pathway, "pathfinder_path"))
 
