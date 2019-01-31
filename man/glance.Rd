@@ -19,6 +19,7 @@ A one-row \link[tibble:tibble]{tibble::tibble} with the following columns
 \item \code{mean_times_crossed} Mean number of times bundles were crossed
 \item \code{max_times_crossed} Maximum number of times bundles were crossed
 \item \code{bundle_most_crossed} Bundle id with the highest number of crossings.
+\item \code{p_multiple_crossed} Proportion of bundles crossed more than once.
 }
 }
 \description{

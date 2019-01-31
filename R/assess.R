@@ -10,6 +10,7 @@
 #'   - `mean_times_crossed` Mean number of times bundles were crossed
 #'   - `max_times_crossed` Maximum number of times bundles were crossed
 #'   - `bundle_most_crossed` Bundle id with the highest number of crossings.
+#'   - `p_multiple_crossed` Proportion of bundles crossed more than once.
 #'
 #' @export
 glance <- function(pathway) {
@@ -27,6 +28,7 @@ glance <- function(pathway) {
   max_times_crossed <- max(times_bundles_crossed$n)
   bundle_most_crossed <- times_bundles_crossed$bundle_id[which.max(times_bundles_crossed$n)]
   mean_times_crossed <- mean(times_bundles_crossed$n)
+  p_multiple_crossed <- sum(times_bundles_crossed$n > 1)/length(times_bundles_crossed$n)
 
   tibble::tibble(
     n_steps,
@@ -35,7 +37,8 @@ glance <- function(pathway) {
     total_distance,
     mean_times_crossed,
     max_times_crossed,
-    bundle_most_crossed
+    bundle_most_crossed,
+    p_multiple_crossed
   )
 }
 
