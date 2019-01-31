@@ -17,7 +17,7 @@ test_that("Decorators add pgh_graph attributes", {
   expect_true(noNA(edge_attr(dg, "pathfinder.required")))
 
   expect_is(edge_attr(dg, "pathfinder.bundle_id"), "integer")
-  expect_true(all(na.omit(edge_attr(dg, "pathfinder.bundle_id")) %in% seq_along(pgh_bundles)))
+  expect_true(all(stats::na.omit(edge_attr(dg, "pathfinder.bundle_id")) %in% seq_along(pgh_bundles)))
 
   expect_is(vertex_attr(dg, "pathfinder.interface"), "logical")
   expect_true(noNA(vertex_attr(dg, "pathfinder.interface")))

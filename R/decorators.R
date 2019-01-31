@@ -1,6 +1,10 @@
 #' Utility function that applies edge and vertex attributes to a graph that will
 #' be used by pathfinder and then later removed.
 #'
+#' @inheritParams greedy_search
+#'
+#' @return
+#'
 #' @import assertthat igraph
 decorate_graph <- function(graph, edge_bundles, distances) {
   assert_that(inherits(graph, "igraph"), msg = "pathfinder currently only works with igraph objects")
@@ -25,5 +29,6 @@ decorate_graph <- function(graph, edge_bundles, distances) {
   vertex_attr(graph, "pathfinder.interface") <- FALSE
   vertex_attr(graph, "pathfinder.interface", index = get_interface_points(graph, edge_bundles)) <- TRUE
 
+  class(graph) <- c(class(graph), "pathfinder_graph")
   graph
 }

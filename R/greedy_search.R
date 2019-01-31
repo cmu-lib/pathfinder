@@ -45,7 +45,7 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
   # Is the starting point on an edge bundle?
   is_edge_bundle <- starting_point %in% search_set
 
-  pathfinding_results <- pathfind(
+  pathfinding_results <- greedy_search_handler(
     pathfinder_graph = pathfinder_graph,
     starting_point = starting_point,
     search_set = search_set,
@@ -100,7 +100,9 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
 #' until it can find no further paths to take.
 #'
 #' @import igraph dequer
-pathfind <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, quiet) {
+greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, quiet) {
+  assertthat::assert_that(inherits(pathfinder_graph, "pathfinder_graph"),
+                          msg = "graph must be decorated with pathfinder attributes. Call decorate_graph() first.")
 
   while (length(search_set) > 0) {
 
@@ -111,7 +113,7 @@ pathfind <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, i
       # Get first uncrossed bundle that goes from this node. This logic is
       # required when a potential node is tangent to two different bridge
       # relations. It will cause the uncrossed relation to be favored.
-      bundle_id <- head(setdiff(na.omit(edge_attr(pathfinder_graph, "pathfinder.bundle_id", E(pathfinder_graph)[.from(starting_point)])), crossed_bundles), 1)
+      bundle_id <- utils::head(setdiff(stats::na.omit(edge_attr(pathfinder_graph, "pathfinder.bundle_id", E(pathfinder_graph)[.from(starting_point)])), crossed_bundles), 1)
       candidate_edges <- which(edge_attr(pathfinder_graph, "pathfinder.bundle_id") == bundle_id)
       # Collect the head/"to" nodes of all the bundle edges, since we will always
       # be starting at the tail/"from" node of a bundle edge
@@ -175,7 +177,7 @@ pathfind <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, i
     pushback(qe, epath)
     pushback(qv, vpath)
 
-    bundles_crossed <- na.omit(unique(edge_attr(pathfinder_graph, "pathfinder.bundle_id", index = epath)))
+    bundles_crossed <- stats::na.omit(unique(edge_attr(pathfinder_graph, "pathfinder.bundle_id", index = epath)))
     recrossings <- which(bundles_crossed %in% crossed_bundles)
     if (length(recrossings) > 0) message(glue::glue("Bundles {paste(bundles_crossed[recrossings], collapse = ';')} recrossed!"))
     if (length(bundles_crossed) > 0) {
@@ -202,7 +204,7 @@ pathfind <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, i
     # Pass two items to the next search step:
     # 1) the final node of the vpath - this becomes the starting point for the next step
     # 2) the pruned search set that removes all the nodes from the bundle just considered
-    starting_point <- tail(vpath, 1)
+    starting_point <- utils::tail(vpath, 1)
     is_bundle_crossing = !is_bundle_crossing
   }
 

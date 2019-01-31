@@ -31,7 +31,7 @@ unique_pathway_edges <- function(pathway) {
 
 pathway_steps <- function(pathway) {
   assert_that(inherits(pathway, "pathfinder_path"))
-  res <- vapply(pathway$vpath, function(x) head(x, 1), FUN.VALUE = integer(1))
+  res <- vapply(pathway$vpath, function(x) utils::head(x, 1), FUN.VALUE = integer(1))
   tibble::tibble(
     node_id = res,
     step = seq_along(res)

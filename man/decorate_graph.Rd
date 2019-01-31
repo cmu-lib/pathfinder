@@ -7,6 +7,13 @@ be used by pathfinder and then later removed.}
 \usage{
 decorate_graph(graph, edge_bundles, distances)
 }
+\arguments{
+\item{graph}{An \link[igraph:igraph]{igraph::igraph} object.}
+
+\item{edge_bundles}{A list of integer vectors. Each list item will be considered one edge bundle, and each vector the edge indices belonging to that bundle.}
+
+\item{distances}{Double. A vector of length \code{ecount(graph)} with the distances of each edge.}
+}
 \description{
 Utility function that applies edge and vertex attributes to a graph that will
 be used by pathfinder and then later removed.
