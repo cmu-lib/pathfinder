@@ -7,7 +7,8 @@ NULL
 message_end <- function(quiet, epath) {
   if (quiet) return(invisible())
   message(glue(
-    "Completed a path with {length(epath)} steps crossing {length(unlist(epath))} edges."))
+    "Completed a path with {length(epath)} steps crossing {length(unlist(epath))} edges."
+  ))
 }
 
 #' @rdname quiet_messaging

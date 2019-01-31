@@ -9,7 +9,9 @@ get_interface_points(graph, edge_bundles)
 \arguments{
 \item{graph}{An \link[igraph:igraph]{igraph::igraph} object.}
 
-\item{edge_bundles}{A list of integer vectors. Each list item will be considered one edge bundle, and each vector the edge indices belonging to that bundle.}
+\item{edge_bundles}{A list of integer vectors. Each list item will be
+considered one edge bundle, and each vector the edge indices belonging to
+that bundle.}
 }
 \description{
 Find the vertices in a graph thatwhere bundled and non-bundled edges are tangent

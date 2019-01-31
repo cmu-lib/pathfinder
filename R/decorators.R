@@ -14,7 +14,8 @@ decorate_graph <- function(graph, edge_bundles, distances) {
   assert_that(is.list(edge_bundles), msg = "edge_bundles must be a list of integer vectors")
   lapply(edge_bundles, function(x) {
     assert_that(all(x %in% seq_len(ecount(graph))),
-                msg = "All integers in each edge_bundles list element must match to edge indices in graph")
+      msg = "All integers in each edge_bundles list element must match to edge indices in graph"
+    )
   })
 
   bundled_edges <- get_bundled_edges(edge_bundles)

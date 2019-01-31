@@ -28,7 +28,7 @@ glance <- function(pathway) {
   max_times_crossed <- max(times_bundles_crossed$n)
   bundle_most_crossed <- times_bundles_crossed$bundle_id[which.max(times_bundles_crossed$n)]
   mean_times_crossed <- mean(times_bundles_crossed$n)
-  p_multiple_crossed <- sum(times_bundles_crossed$n > 1)/length(times_bundles_crossed$n)
+  p_multiple_crossed <- sum(times_bundles_crossed$n > 1) / length(times_bundles_crossed$n)
 
   tibble::tibble(
     n_steps,
@@ -89,10 +89,12 @@ augment <- function(pathway) {
     index,
     step_id,
     edge_id,
-    bundle_id) %>%
+    bundle_id
+  ) %>%
     mutate(
       # True for any step that crosses onto a bridge from either a non-bridge or a different bridge
-      bundle_switch = !is.na(bundle_id) & (is.na(lag(bundle_id)) | (lag(bundle_id) != bundle_id))) %>%
+      bundle_switch = !is.na(bundle_id) & (is.na(lag(bundle_id)) | (lag(bundle_id) != bundle_id))
+    ) %>%
     group_by(edge_id) %>%
     mutate(times_edge_crossed = row_number()) %>%
     group_by(bundle_id) %>%
@@ -109,5 +111,3 @@ bundle_cross_count <- function(bpath) {
   res$n <- as.integer(res$n)
   res
 }
-
-

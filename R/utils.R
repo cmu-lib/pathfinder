@@ -38,11 +38,13 @@ get_interface_points <- function(graph, edge_bundles) {
   both_tangent
 }
 
+#' @export
 unique_pathway_edges <- function(pathway) {
   assert_that(inherits(pathway, "pathfinder_path"))
   unique(unlist(pathway$epath))
 }
 
+#' @export
 pathway_steps <- function(pathway) {
   assert_that(inherits(pathway, "pathfinder_path"))
   res <- vapply(pathway$vpath, function(x) utils::head(x, 1), FUN.VALUE = integer(1))

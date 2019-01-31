@@ -12,10 +12,15 @@
 #' options available.
 #'
 #' @param graph An [igraph::igraph] object.
-#' @param starting_point Integer. Index of the point from which to start the search.
-#' @param edge_bundles A list of integer vectors. Each list item will be considered one edge bundle, and each vector the edge indices belonging to that bundle.
-#' @param distances Double. A vector of length `ecount(graph)` with the distances of each edge.
-#' @param penalize Boolean. Penalize the edge distance of already-crossed bundles to discourage crossing the same bundles more than once?
+#' @param starting_point Integer. Index of the point from which to start the
+#'   search.
+#' @param edge_bundles A list of integer vectors. Each list item will be
+#'   considered one edge bundle, and each vector the edge indices belonging to
+#'   that bundle.
+#' @param distances Double. A vector of length `ecount(graph)` with the
+#'   distances of each edge.
+#' @param penalize Boolean. Penalize the edge distance of already-crossed
+#'   bundles to discourage crossing the same bundles more than once?
 #' @param penalty_fun A function to penalize the weights of all edges in a
 #'   bundle any time at least one edge in that bundle is traversed. Defaults to
 #'   [`penalty_square`], however can be set to [`penalty_inf`] to se weight to
@@ -26,9 +31,12 @@
 #' @import assertthat
 #'
 #' @return A `pathfinder` object, which is a list with the following elements:
-#' - `epath`: A list of integer vectors representing the successive edges crossed by the path
-#' - `vpath`: A list of integer vectors representing the sucessive vertices crossed by the path
-#' - `bpath`: A list of integer vectors representing the sucessive edge bundles crossed by the path
+#' - `epath`: A list of integer vectors representing the successive edges
+#' crossed by the path
+#' - `vpath`: A list of integer vectors representing the sucessive vertices
+#' crossed by the path
+#' - `bpath`: A list of integer vectors representing the sucessive edge bundles
+#' crossed by the path
 #'
 #' @export
 greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, penalize = TRUE, penalty_fun = penalize_square, quiet = !interactive()) {
@@ -58,9 +66,10 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
     is_bundle_crossing = is_edge_bundle,
     penalize = penalize,
     penalty_fun = penalty_fun,
-    quiet = quiet)
+    quiet = quiet
+  )
 
-  working_distances = as.list(q)
+  working_distances <- as.list(q)
   vpath <- as.list(qv)
   epath <- as.list(qe)
   bpath <- as.list(qb)
@@ -76,7 +85,8 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
       ending_point = pathfinding_results$point,
       remaining_search_set = pathfinding_results$search_set
     ),
-    class = "pathfinder_path")
+    class = "pathfinder_path"
+  )
 
   message_end(quiet, epath = pathway$epath)
   return(pathway)
@@ -110,10 +120,10 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
 #' @import igraph dequer
 greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, penalize, penalty_fun = penalize_square, quiet) {
   assertthat::assert_that(inherits(pathfinder_graph, "pathfinder_graph"),
-                          msg = "graph must be decorated with pathfinder attributes. Call decorate_graph() first.")
+    msg = "graph must be decorated with pathfinder attributes. Call decorate_graph() first."
+  )
 
   while (length(search_set) > 0) {
-
     crossed_bundles <- unlist(as.list(qb))
     search_set <- setdiff(search_set, starting_point)
 
@@ -145,7 +155,9 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
           break_reason = "Stopped early, not all points reachable",
           point = starting_point,
           candidates = candidate_points,
-          search_set = search_set))
+          search_set = search_set
+        )
+      )
     }
 
     possible_paths <- get_possible_paths(pathfinder_graph, candidate_distances$candidate_distances, candidate_distances$bundle_graph, starting_point, candidate_points, candidate_edges, is_bundle_crossing)
@@ -176,7 +188,10 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
       }
 
       # Remove all nodes on the crossed bundle from the remaining search set
-      bundle_nodes <- union(as.integer(head_of(pathfinder_graph, es = bundle_edges)), as.integer(tail_of(pathfinder_graph, es = bundle_edges)))
+      bundle_nodes <- union(
+        as.integer(head_of(pathfinder_graph, es = bundle_edges)),
+        as.integer(tail_of(pathfinder_graph, es = bundle_edges))
+      )
       removed_nodes <- intersect(search_set, bundle_nodes)
       if (length(removed_nodes) > 0) {
         search_set <- setdiff(search_set, bundle_nodes)
@@ -188,7 +203,7 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
     # 1) the final node of the vpath - this becomes the starting point for the next step
     # 2) the pruned search set that removes all the nodes from the bundle just considered
     starting_point <- utils::tail(vpath, 1)
-    is_bundle_crossing = !is_bundle_crossing
+    is_bundle_crossing <- !is_bundle_crossing
   }
 
   # If all bundles have been reached, return out empty set
@@ -198,7 +213,9 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
       break_reason = "All paths done",
       point = starting_point,
       candidates = candidate_points,
-      search_set = search_set))
+      search_set = search_set
+    )
+  )
 }
 
 get_candidate_points <- function(pathfinder_graph, starting_point, search_set, is_bundle_crossing, crossed_bundles) {
@@ -206,12 +223,17 @@ get_candidate_points <- function(pathfinder_graph, starting_point, search_set, i
     # Get first uncrossed bundle that goes from this node. This logic is
     # required when a potential node is tangent to two different bridge
     # relations. It will cause the uncrossed relation to be favored.
-    bundle_id <- utils::head(setdiff(stats::na.omit(edge_attr(pathfinder_graph, "pathfinder.bundle_id", E(pathfinder_graph)[.from(starting_point)])), crossed_bundles), 1)
+    bundle_id <- utils::head(setdiff(stats::na.omit(
+      edge_attr(pathfinder_graph, "pathfinder.bundle_id",
+        index = E(pathfinder_graph)[.from(starting_point)]
+      )
+    ), crossed_bundles), 1)
     candidate_edges <- which(edge_attr(pathfinder_graph, "pathfinder.bundle_id") == bundle_id)
     # Collect the head/"to" nodes of all the bundle edges, since we will always
     # be starting at the tail/"from" node of a bundle edge
     candidate_points <- setdiff(unique(
-      as.integer(head_of(pathfinder_graph, es = candidate_edges))), starting_point)
+      as.integer(head_of(pathfinder_graph, es = candidate_edges))
+    ), starting_point)
   } else {
     bundle_id <- NULL
     candidate_points <- search_set
@@ -231,8 +253,10 @@ get_candidate_distances <- function(pathfinder_graph, starting_point, candidate_
     candidate_distances <- distances(bundle_graph, v = starting_point, to = candidate_points, mode = "out", weights = edge_attr(bundle_graph, "pathfinder.distance"))
   } else {
     bundle_graph <- NULL
-    candidate_distances <- distances(pathfinder_graph, v = starting_point, to = candidate_points, mode = "out",
-                                     weights = edge_attr(pathfinder_graph, "pathfinder.distance"))
+    candidate_distances <- distances(pathfinder_graph,
+      v = starting_point, to = candidate_points, mode = "out",
+      weights = edge_attr(pathfinder_graph, "pathfinder.distance")
+    )
   }
 
   list(
@@ -250,14 +274,21 @@ get_possible_paths <- function(pathfinder_graph, candidate_distances, bundle_gra
     ranking[is.infinite(candidate_distances)] <- 0L
     target_point <- candidate_points[which.max(ranking)]
     suppressWarnings({
-      possible_paths <- shortest_paths(bundle_graph, from = starting_point, to = target_point, mode = "out", output = "both", weights = edge_attr(bundle_graph, "pathfinder.distance"))
+      possible_paths <- shortest_paths(
+        bundle_graph,
+        from = starting_point, to = target_point,
+        mode = "out", output = "both",
+        weights = edge_attr(bundle_graph, "pathfinder.distance")
+      )
     })
   } else {
     # Find the closest point and try navigating to it
     target_point <- candidate_points[which.min(candidate_distances)]
     suppressWarnings({
-      possible_paths <- shortest_paths(pathfinder_graph, from = starting_point, to = target_point,
-                                       weights = edge_attr(pathfinder_graph, "pathfinder.distance"), output = "both", mode = "out")
+      possible_paths <- shortest_paths(pathfinder_graph,
+        from = starting_point, to = target_point,
+        weights = edge_attr(pathfinder_graph, "pathfinder.distance"), output = "both", mode = "out"
+      )
     })
   }
 

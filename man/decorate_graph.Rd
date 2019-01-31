@@ -10,9 +10,12 @@ decorate_graph(graph, edge_bundles, distances)
 \arguments{
 \item{graph}{An \link[igraph:igraph]{igraph::igraph} object.}
 
-\item{edge_bundles}{A list of integer vectors. Each list item will be considered one edge bundle, and each vector the edge indices belonging to that bundle.}
+\item{edge_bundles}{A list of integer vectors. Each list item will be
+considered one edge bundle, and each vector the edge indices belonging to
+that bundle.}
 
-\item{distances}{Double. A vector of length \code{ecount(graph)} with the distances of each edge.}
+\item{distances}{Double. A vector of length \code{ecount(graph)} with the
+distances of each edge.}
 }
 \value{
 A \code{pathfinder_graph} object.

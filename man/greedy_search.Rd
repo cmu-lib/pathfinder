@@ -11,13 +11,18 @@ greedy_search(graph, edge_bundles, distances, starting_point = 1,
 \arguments{
 \item{graph}{An \link[igraph:igraph]{igraph::igraph} object.}
 
-\item{edge_bundles}{A list of integer vectors. Each list item will be considered one edge bundle, and each vector the edge indices belonging to that bundle.}
+\item{edge_bundles}{A list of integer vectors. Each list item will be
+considered one edge bundle, and each vector the edge indices belonging to
+that bundle.}
 
-\item{distances}{Double. A vector of length \code{ecount(graph)} with the distances of each edge.}
+\item{distances}{Double. A vector of length \code{ecount(graph)} with the
+distances of each edge.}
 
-\item{starting_point}{Integer. Index of the point from which to start the search.}
+\item{starting_point}{Integer. Index of the point from which to start the
+search.}
 
-\item{penalize}{Boolean. Penalize the edge distance of already-crossed bundles to discourage crossing the same bundles more than once?}
+\item{penalize}{Boolean. Penalize the edge distance of already-crossed
+bundles to discourage crossing the same bundles more than once?}
 
 \item{penalty_fun}{A function to penalize the weights of all edges in a
 bundle any time at least one edge in that bundle is traversed. Defaults to
@@ -30,9 +35,12 @@ in an incomplete path. Ignored if \code{penalize = FALSE}.}
 \value{
 A \code{pathfinder} object, which is a list with the following elements:
 \itemize{
-\item \code{epath}: A list of integer vectors representing the successive edges crossed by the path
-\item \code{vpath}: A list of integer vectors representing the sucessive vertices crossed by the path
-\item \code{bpath}: A list of integer vectors representing the sucessive edge bundles crossed by the path
+\item \code{epath}: A list of integer vectors representing the successive edges
+crossed by the path
+\item \code{vpath}: A list of integer vectors representing the sucessive vertices
+crossed by the path
+\item \code{bpath}: A list of integer vectors representing the sucessive edge bundles
+crossed by the path
 }
 }
 \description{
