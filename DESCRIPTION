@@ -25,6 +25,7 @@ Imports:
     progress
 Suggests: 
     dplyr,
+    magrittr,
     ggraph,
     testthat
 Encoding: UTF-8
