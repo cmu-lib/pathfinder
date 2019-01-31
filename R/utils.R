@@ -3,7 +3,6 @@ penalize <- function(x) {
   (x + 1000)^2
 }
 
-#' @export
 get_bundled_edges <- function(edge_bundles) {
   res <- unlist(edge_bundles)
   bundle_ids <- unlist(mapply(rep, seq_along(edge_bundles), vapply(edge_bundles, length, FUN.VALUE = integer(1))))
@@ -11,6 +10,10 @@ get_bundled_edges <- function(edge_bundles) {
   res
 }
 
+#' Find the vertices in a graph thatwhere bundled and non-bundled edges are tangent
+#'
+#' @inheritParams greedy_search
+#'
 #' @export
 get_interface_points <- function(graph, edge_bundles) {
   bundled_edges <- get_bundled_edges(edge_bundles)
