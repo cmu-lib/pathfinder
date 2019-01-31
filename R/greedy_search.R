@@ -35,11 +35,9 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
 
   # Create queues to hold edgelist, nodelist, and bundlelist, since we don't know
   # how long they need to be ahead of time.
-  q <- dequer::queue()
   qe <- dequer::queue()
   qv <- dequer::queue()
   qb <- dequer::queue()
-  qd <- dequer::queue()
 
   # Collect all interface points on graph that will potentially need to be visited
   search_set <- which(vertex_attr(pathfinder_graph, "pathfinder.interface"))
@@ -51,7 +49,7 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
     pathfinder_graph = pathfinder_graph,
     starting_point = starting_point,
     search_set = search_set,
-    q = q, qe = qe, qv = qv, qb = qb, qd = qd,
+    qe = qe, qv = qv, qb = qb,
     is_bundle_crossing = is_edge_bundle,
     quiet = quiet)
 
@@ -102,7 +100,7 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
 #' until it can find no further paths to take.
 #'
 #' @import igraph dequer
-pathfind <- function(pathfinder_graph, starting_point, search_set, q, qe, qv, qb, qd, is_bundle_crossing, quiet) {
+pathfind <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, quiet) {
 
   while (length(search_set) > 0) {
 
@@ -171,14 +169,11 @@ pathfind <- function(pathfinder_graph, starting_point, search_set, q, qe, qv, qb
       })
     }
 
-    pushback(q, list(is_bundle_crossing = is_bundle_crossing, candidates = candidate_distances, chosen_path = possible_paths))
     epath <- possible_paths$epath[[1]]$pathfinder.edge_id
-    distances <- possible_paths$epath[[1]]$pathfinder.distance
     vpath <- as.integer(possible_paths$vpath[[1]])
 
     pushback(qe, epath)
     pushback(qv, vpath)
-    pushback(qd, distances)
 
     bundles_crossed <- na.omit(unique(edge_attr(pathfinder_graph, "pathfinder.bundle_id", index = epath)))
     recrossings <- which(bundles_crossed %in% crossed_bundles)

@@ -19,16 +19,15 @@ Depends:
 Imports: 
     assertthat,
     dequer,
-    glue,
-    purrr,
-    tibble,
-    progress
-Suggests: 
     dplyr,
-    magrittr,
     ggraph,
-    testthat,
-    covr
+    glue,
+    magrittr,
+    purrr,
+    tibble
+Suggests: 
+    covr,
+    testthat
 Encoding: UTF-8
 Language: en-US
 LazyData: true
