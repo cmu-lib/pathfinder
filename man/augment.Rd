@@ -10,13 +10,15 @@ augment(pathway)
 \item{pathway}{A \code{pathfinder_results} object from, e.g. \code{\link{greedy_search}}.}
 }
 \value{
-A \link[tibble:tibble]{tibble::tibble} with the following columns
-- \code{index} Row number
-- \code{step_id} Step of the pathfinding algorithm
-- \code{edge_id} ID of edge crossed in this step (can be repeated)
-- \code{bundle_id} Id of bundle crossed in this step (\code{NA} if edge is not a bundle)
-- \code{times_edge_crossed} Cumulative times this edge has been crossed since the start of the path
-- \code{times_bundle_crossed} Cumulative times this bundle has been crossed since the start of the path
+A \link[tibble:tibble]{tibble::tibble} with the following columns:
+\itemize{
+\item \code{index} Row number
+\item \code{step_id} Step of the pathfinding algorithm
+\item \code{edge_id} ID of edge crossed in this step (can be repeated)
+\item \code{bundle_id} Id of bundle crossed in this step (\code{NA} if edge is not a bundle)
+\item \code{times_edge_crossed} Cumulative times this edge has been crossed since the start of the path
+\item \code{times_bundle_crossed} Cumulative times this bundle has been crossed since the start of the path
+}
 }
 \description{
 Returns a tidy data frame with one row per edge crossing

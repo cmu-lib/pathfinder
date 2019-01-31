@@ -11,8 +11,10 @@ tidy(pathway)
 }
 \value{
 A \link[tibble:tibble]{tibble::tibble} with the following columns
-- \code{bundle_id}
-- \code{times_crossed}
+\itemize{
+\item \code{bundle_id}
+\item \code{times_crossed}
+}
 }
 \description{
 Returns a tidy data frame with one row per edge bundle

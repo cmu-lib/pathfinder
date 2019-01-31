@@ -42,8 +42,8 @@ glance <- function(pathway) {
 #' @param pathway A `pathfinder_results` object from, e.g. [`greedy_search`].
 #'
 #' @return A [tibble::tibble] with the following columns
-#'     - `bundle_id`
-#'     - `times_crossed`
+#'   - `bundle_id`
+#'   - `times_crossed`
 tidy <- function(pathway) {
   bundle_cross_count(pathway$bpath)
 }
@@ -52,13 +52,13 @@ tidy <- function(pathway) {
 #'
 #' @param pathway A `pathfinder_results` object from, e.g. [`greedy_search`].
 #'
-#' @return A [tibble::tibble] with the following columns
-#'     - `index` Row number
-#'     - `step_id` Step of the pathfinding algorithm
-#'     - `edge_id` ID of edge crossed in this step (can be repeated)
-#'     - `bundle_id` Id of bundle crossed in this step (`NA` if edge is not a bundle)
-#'     - `times_edge_crossed` Cumulative times this edge has been crossed since the start of the path
-#'     - `times_bundle_crossed` Cumulative times this bundle has been crossed since the start of the path
+#' @return A [tibble::tibble] with the following columns:
+#'   - `index` Row number
+#'   - `step_id` Step of the pathfinding algorithm
+#'   - `edge_id` ID of edge crossed in this step (can be repeated)
+#'   - `bundle_id` Id of bundle crossed in this step (`NA` if edge is not a bundle)
+#'   - `times_edge_crossed` Cumulative times this edge has been crossed since the start of the path
+#'   - `times_bundle_crossed` Cumulative times this bundle has been crossed since the start of the path
 #' @importFrom dplyr mutate group_by ungroup select lag row_number
 #' @import magrittr
 #' @export
