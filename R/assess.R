@@ -12,7 +12,7 @@
 #'   - `bundle_most_crossed` Bundle id with the highest number of crossings.
 #'
 #' @export
-assess_path <- function(pathway) {
+glance <- function(pathway) {
   starting_point <- pathway$starting_point
   ending_point <- pathway$pathfinding_results$point
   n_steps <- length(pathway$epath)
@@ -20,11 +20,10 @@ assess_path <- function(pathway) {
   bundle_itinterary <- unlist(pathway$bpath)
 
   total_distance <- sum(distances[edge_itinerary])
-  times_bundles_crossed <- tibble::enframe(table(bundle_itinterary), name = "bundle.id", value = "n")
-  times_bundles_crossed$bundle.id <- as.integer(as.character(times_bundles_crossed$bundle.id))
+  times_bundles_crossed <- bundle_cross_count(pathway$bpath)
 
   max_times_crossed <- max(times_bundles_crossed$n)
-  bundle_most_crossed <- times_bundles_crossed$bundle.id[which.max(times_bundles_crossed$n)]
+  bundle_most_crossed <- times_bundles_crossed$bundle_id[which.max(times_bundles_crossed$n)]
   mean_times_crossed <- mean(times_bundles_crossed$n)
 
   tibble::tibble(
@@ -37,3 +36,68 @@ assess_path <- function(pathway) {
     bundle_most_crossed
   )
 }
+
+#' Returns a tidy data frame with one row per edge bundle
+#'
+#' @param pathway A `pathfinder_results` object from, e.g. [`greedy_search`].
+#'
+#' @return A [tibble::tibble] with the following columns
+#'     - `bundle_id`
+#'     - `times_crossed`
+tidy <- function(pathway) {
+  bundle_cross_count(pathway$bpath)
+}
+
+#' Returns a tidy data frame with one row per edge crossing
+#'
+#' @param pathway A `pathfinder_results` object from, e.g. [`greedy_search`].
+#'
+#' @return A [tibble::tibble] with the following columns
+#'     - `index` Row number
+#'     - `step_id` Step of the pathfinding algorithm
+#'     - `edge_id` ID of edge crossed in this step (can be repeated)
+#'     - `bundle_id` Id of bundle crossed in this step (`NA` if edge is not a bundle)
+#'     - `times_edge_crossed` Cumulative times this edge has been crossed since the start of the path
+#'     - `times_bundle_crossed` Cumulative times this bundle has been crossed since the start of the path
+#' @import dplyr
+#' @export
+augment <- function(pathway) {
+  suppressPackageStartupMessages({
+    assertthat::assert_that(require(dplyr), msg = "augment() requires dplyr")
+  })
+
+
+  all_edges <- unlist(pathway$epath)
+  step_id <- unlist(mapply(function(e, i) rep(i, times = length(e)), pathway$epath, seq_along(pathway$epath)))
+  bundled_edges <- get_bundled_edges(pathway$edge_bundles)
+
+  index <- seq_along(all_edges)
+  edge_id <- all_edges
+  bundle_id <- attr(bundled_edges, "pathfinder.bundle_ids")[match(all_edges, bundled_edges)]
+
+  res <- tibble::tibble(
+    index,
+    step_id,
+    edge_id,
+    bundle_id)
+
+  res %>%
+    mutate(
+      # True for any step that crosses onto a bridge from either a non-bridge or a different bridge
+      bundle_switch = !is.na(bundle_id) & (is.na(lag(bundle_id)) | (lag(bundle_id) != bundle_id))) %>%
+    group_by(edge_id) %>%
+    mutate(times_edge_crossed = row_number()) %>%
+    group_by(bundle_id) %>%
+    mutate(times_bundle_crossed = cumsum(bundle_switch)) %>%
+    ungroup() %>%
+    select(-bundle_switch)
+}
+
+bundle_cross_count <- function(bpath) {
+  res <- tibble::enframe(table(unlist(bpath)), name = "bundle_id", value = "n")
+  res$bundle.id <- as.integer(as.character(res$bundle.id))
+  res$n <- as.integer(res$n)
+  res
+}
+
+

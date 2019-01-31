@@ -24,6 +24,7 @@ Imports:
     tibble,
     progress
 Suggests: 
+    dplyr,
     ggraph,
     testthat
 Encoding: UTF-8

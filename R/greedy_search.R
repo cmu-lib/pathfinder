@@ -66,10 +66,10 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
       epath = epath,
       vpath = vpath,
       bpath = bpath,
-      working_distances = working_distances,
+      edge_bundles = edge_bundles,
       distances = distances,
-      pathfinding_results = pathfinding_results,
-      starting_point = starting_point
+      starting_point = starting_point,
+      ending_point = pathfinding_results$point
     ),
     class = "pathfinder_path")
 
