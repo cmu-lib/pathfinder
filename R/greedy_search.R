@@ -109,20 +109,10 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
     crossed_bundles <- unlist(as.list(qb))
     search_set <- setdiff(search_set, starting_point)
 
-    if (is_bundle_crossing) {
-      # Get first uncrossed bundle that goes from this node. This logic is
-      # required when a potential node is tangent to two different bridge
-      # relations. It will cause the uncrossed relation to be favored.
-      bundle_id <- utils::head(setdiff(stats::na.omit(edge_attr(pathfinder_graph, "pathfinder.bundle_id", E(pathfinder_graph)[.from(starting_point)])), crossed_bundles), 1)
-      candidate_edges <- which(edge_attr(pathfinder_graph, "pathfinder.bundle_id") == bundle_id)
-      # Collect the head/"to" nodes of all the bundle edges, since we will always
-      # be starting at the tail/"from" node of a bundle edge
-      candidate_points <- setdiff(unique(
-        as.integer(head_of(pathfinder_graph, es = candidate_edges))), starting_point)
-    } else {
-      bundle_id <- NULL
-      candidate_points <- search_set
-    }
+    starter_ids <- get_candidate_points(pathfinder_graph, starting_point, search_set, is_bundle_crossing, crossed_bundles)
+    candidate_points <- starter_ids$candidate_points
+    candidate_edges <- starter_ids$candidate_edges
+    bundle_id <- starter_ids$bundle_id
 
     # If the candidate point lengths are 0, this means the point may likely be
     # tangent to another bundle and so it's not inherited both associated bundle
@@ -217,4 +207,28 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
       candidates = candidate_points,
       search_set = search_set,
       distances = candidate_distances))
+}
+
+get_candidate_points <- function(pathfinder_graph, starting_point, search_set, is_bundle_crossing, crossed_bundles) {
+  if (is_bundle_crossing) {
+    # Get first uncrossed bundle that goes from this node. This logic is
+    # required when a potential node is tangent to two different bridge
+    # relations. It will cause the uncrossed relation to be favored.
+    bundle_id <- utils::head(setdiff(stats::na.omit(edge_attr(pathfinder_graph, "pathfinder.bundle_id", E(pathfinder_graph)[.from(starting_point)])), crossed_bundles), 1)
+    candidate_edges <- which(edge_attr(pathfinder_graph, "pathfinder.bundle_id") == bundle_id)
+    # Collect the head/"to" nodes of all the bundle edges, since we will always
+    # be starting at the tail/"from" node of a bundle edge
+    candidate_points <- setdiff(unique(
+      as.integer(head_of(pathfinder_graph, es = candidate_edges))), starting_point)
+  } else {
+    bundle_id <- NULL
+    candidate_points <- search_set
+    candidate_edges <- NULL
+  }
+
+  list(
+    bundle_id = bundle_id,
+    candidate_points = candidate_points,
+    candidate_edges = candidate_edges
+  )
 }
