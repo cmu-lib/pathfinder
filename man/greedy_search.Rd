@@ -5,7 +5,8 @@
 \title{Greedy search for bundled edges}
 \usage{
 greedy_search(graph, edge_bundles, distances, starting_point = 1,
-  penalize = TRUE, quiet = !interactive())
+  penalize = TRUE, penalty_fun = penalize_square,
+  quiet = !interactive())
 }
 \arguments{
 \item{graph}{An \link[igraph:igraph]{igraph::igraph} object.}
@@ -17,6 +18,12 @@ greedy_search(graph, edge_bundles, distances, starting_point = 1,
 \item{starting_point}{Integer. Index of the point from which to start the search.}
 
 \item{penalize}{Boolean. Penalize the edge distance of already-crossed bundles to discourage crossing the same bundles more than once?}
+
+\item{penalty_fun}{A function to penalize the weights of all edges in a
+bundle any time at least one edge in that bundle is traversed. Defaults to
+\code{\link{penalty_square}}, however can be set to \code{\link{penalty_inf}} to se weight to
+\code{Inf} and thus forbid recrossing a bundle. Using \code{\link{penalty_inf}} can result
+in an incomplete path. Ignored if \code{penalize = FALSE}.}
 
 \item{quiet}{Boolean. Display progress?}
 }

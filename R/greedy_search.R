@@ -16,6 +16,11 @@
 #' @param edge_bundles A list of integer vectors. Each list item will be considered one edge bundle, and each vector the edge indices belonging to that bundle.
 #' @param distances Double. A vector of length `ecount(graph)` with the distances of each edge.
 #' @param penalize Boolean. Penalize the edge distance of already-crossed bundles to discourage crossing the same bundles more than once?
+#' @param penalty_fun A function to penalize the weights of all edges in a
+#'   bundle any time at least one edge in that bundle is traversed. Defaults to
+#'   [`penalty_square`], however can be set to [`penalty_inf`] to se weight to
+#'   `Inf` and thus forbid recrossing a bundle. Using [`penalty_inf`] can result
+#'   in an incomplete path. Ignored if `penalize = FALSE`.
 #' @param quiet Boolean. Display progress?
 #'
 #' @import assertthat
@@ -26,7 +31,7 @@
 #' - `bpath`: A list of integer vectors representing the sucessive edge bundles crossed by the path
 #'
 #' @export
-greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, penalize = TRUE, quiet = !interactive()) {
+greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, penalize = TRUE, penalty_fun = penalize_square, quiet = !interactive()) {
   pathfinder_graph <- decorate_graph(graph, edge_bundles, distances)
   assert_that(is.count(starting_point))
   assert_that(starting_point %in% seq_len(vcount(pathfinder_graph)), msg = "starting_point must be an index of a vertex in graph")
@@ -101,7 +106,7 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
 #' until it can find no further paths to take.
 #'
 #' @import igraph dequer
-greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, penalize, quiet) {
+greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, penalize, penalty_fun = penalize_square, quiet) {
   assertthat::assert_that(inherits(pathfinder_graph, "pathfinder_graph"),
                           msg = "graph must be decorated with pathfinder attributes. Call decorate_graph() first.")
 
@@ -145,17 +150,17 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
       pushback(qb, bundles_crossed)
       message_crossed(quiet, bundles_crossed)
 
+      bundle_edges <- which(edge_attr(pathfinder_graph, "pathfinder.bundle_id") %in% bundles_crossed)
+
       if (penalize == TRUE) {
         # ALL edges belonging to the bundle, whether they were actually crossed or
         # not, get penalized, and their nodes removed from the search list
-        bundle_edges <- which(edge_attr(pathfinder_graph, "pathfinder.bundle_id") %in% bundles_crossed)
-        bundle_nodes <- union(as.integer(head_of(pathfinder_graph, es = bundle_edges)), as.integer(tail_of(pathfinder_graph, es = bundle_edges)))
-
         message_increase(quiet, bundle_edges)
-        edge_attr(pathfinder_graph, "pathfinder.distance", index = bundle_edges) <- penalize(edge_attr(pathfinder_graph, "pathfinder.distance", index = bundle_edges))
+        edge_attr(pathfinder_graph, "pathfinder.distance", index = bundle_edges) <- penalty_fun(edge_attr(pathfinder_graph, "pathfinder.distance", index = bundle_edges))
       }
 
       # Remove all nodes on the crossed bundle from the remaining search set
+      bundle_nodes <- union(as.integer(head_of(pathfinder_graph, es = bundle_edges)), as.integer(tail_of(pathfinder_graph, es = bundle_edges)))
       removed_nodes <- intersect(search_set, bundle_nodes)
       if (length(removed_nodes) > 0) {
         search_set <- setdiff(search_set, bundle_nodes)

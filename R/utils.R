@@ -1,6 +1,20 @@
-#' Edge weight penalty function
-penalize <- function(x) {
+#' Edge weight penalty functions
+#'
+#' @param x Numeric. Edge distance
+#'
+#' @return Numeric the same length as `x`
+#'
+#' @name penalize
+NULL
+
+#' @rdname penalize
+penalize_square <- function(x) {
   (x + 1000)^2
+}
+
+#' @rdname penalize
+penalize_inf <- function(x) {
+  rep(Inf, times = length(x))
 }
 
 get_bundled_edges <- function(edge_bundles) {

@@ -5,7 +5,7 @@
 \title{Pathfinding handler}
 \usage{
 greedy_search_handler(pathfinder_graph, starting_point, search_set, qe, qv,
-  qb, is_bundle_crossing, quiet)
+  qb, is_bundle_crossing, penalize, penalty_fun = penalize_square, quiet)
 }
 \description{
 Primary recursive function that steps through the graph. This function has two

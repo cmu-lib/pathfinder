@@ -14,6 +14,9 @@ decorate_graph(graph, edge_bundles, distances)
 
 \item{distances}{Double. A vector of length \code{ecount(graph)} with the distances of each edge.}
 }
+\value{
+A \code{pathfinder_graph} object.
+}
 \description{
 Utility function that applies edge and vertex attributes to a graph that will
 be used by pathfinder and then later removed.

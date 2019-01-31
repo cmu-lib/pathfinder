@@ -2,10 +2,20 @@
 % Please edit documentation in R/utils.R
 \name{penalize}
 \alias{penalize}
-\title{Edge weight penalty function}
+\alias{penalize_square}
+\alias{penalize_inf}
+\title{Edge weight penalty functions}
 \usage{
-penalize(x)
+penalize_square(x)
+
+penalize_inf(x)
+}
+\arguments{
+\item{x}{Numeric. Edge distance}
+}
+\value{
+Numeric the same length as \code{x}
 }
 \description{
-Edge weight penalty function
+Edge weight penalty functions
 }

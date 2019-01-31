@@ -3,7 +3,7 @@
 #'
 #' @inheritParams greedy_search
 #'
-#' @return
+#' @return A `pathfinder_graph` object.
 #'
 #' @import assertthat igraph
 decorate_graph <- function(graph, edge_bundles, distances) {
