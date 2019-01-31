@@ -28,3 +28,26 @@ You can install the development version:
 devtools::install_github("dSHARP-CMU/pathfinder")
 ```
 
+## Usage
+
+Starting with an igraph object, specify edge bundles that must be traversed by using a list of edge indices:
+
+```{r}
+# A small subset of road data from Pittsburgh
+pgh_graph
+
+pgh_distances
+
+# Edges belonging to Pittsburgh bridges
+pgh_bundles
+```
+
+`greedy_search()` will traverse teh graph by jumping from closest edge bundle to closest edge bundle.
+By setting `penalize = TRUE` you can add a sever edge weight penalty to crossed bundles to disincentivize crossing bundles more than once.
+
+```{r}
+unpenalized_run <- greedy_search(graph, edge_bundles = bundles, distances = edge_distances)
+
+```
+
+```{r}
