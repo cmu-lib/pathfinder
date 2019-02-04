@@ -1,20 +1,21 @@
 #' Edge weight penalty functions
 #'
-#' @param x Numeric. Edge distance
+#' @param x Numeric. All edge distances from the graph
+#' @param i Integer. The edge indices whose penalized weights will be returned.
 #'
-#' @return Numeric the same length as `x`
+#' @return Numeric the same length as `i`.
 #'
 #' @name penalize
 NULL
 
-#' @rdname penalize
-penalize_square <- function(x) {
-  (x + 1000)^2
+#' @describeIn penalize Add a constant based on the total edge distance in the graph and then squares the result.
+penalize_square <- function(x, i) {
+  ((x[i]) + sum(x))^2
 }
 
-#' @rdname penalize
-penalize_inf <- function(x) {
-  rep(Inf, times = length(x))
+#' @describeIn penalize Make edge distances `Inf`
+penalize_inf <- function(x, i) {
+  rep(Inf, times = length(i))
 }
 
 get_bundled_edges <- function(edge_bundles) {

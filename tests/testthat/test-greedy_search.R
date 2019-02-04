@@ -32,3 +32,7 @@ test_that("greedy_search works with infinte penalty", {
   expect_gt(length(inf_pathway$vpath), 1L)
   expect_equivalent(anyDuplicated(unlist(inf_pathway$bpath)), 0)
 })
+
+test_that("bad penalty function raises error", {
+  expect_error(greedy_search(pgh_graph, pgh_bundles, pgh_distances, starting_point = 1L, penalty_fun = function(x, i) return(1:10), quiet = TRUE), regexp = "vector of distances the same length as the number of edge indices passed to it")
+})

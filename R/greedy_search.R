@@ -23,9 +23,10 @@
 #'   bundles to discourage crossing the same bundles more than once?
 #' @param penalty_fun A function to penalize the weights of all edges in a
 #'   bundle any time at least one edge in that bundle is traversed. Defaults to
-#'   [`penalty_square`], however can be set to [`penalty_inf`] to se weight to
+#'   [`penalty_square`], however can be set to [`penalty_inf`] to set weight to
 #'   `Inf` and thus forbid recrossing a bundle. Using [`penalty_inf`] can result
-#'   in an incomplete path. Ignored if `penalize = FALSE`.
+#'   in an incomplete path. See [`penalize`] for guidance on supplying your own
+#'   function. Ignored if `penalize = FALSE`.
 #' @param quiet Boolean. Display progress?
 #'
 #' @import assertthat
@@ -183,7 +184,8 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
         # ALL edges belonging to the bundle, whether they were actually crossed or
         # not, get penalized, and their nodes removed from the search list
         message_increase(quiet, bundle_edges)
-        new_distances <- penalty_fun(edge_attr(pathfinder_graph, "pathfinder.distance", index = bundle_edges))
+        new_distances <- penalty_fun(edge_attr(pathfinder_graph, "pathfinder.distance"), bundle_edges)
+        assert_that(length(new_distances) == length(bundle_edges), msg = "penalty_fun must return a vector of distances the same length as the number of edge indices passed to it")
         edge_attr(pathfinder_graph, "pathfinder.distance", index = bundle_edges) <- new_distances
       }
 

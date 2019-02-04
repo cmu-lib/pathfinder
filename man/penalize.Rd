@@ -6,16 +6,25 @@
 \alias{penalize_inf}
 \title{Edge weight penalty functions}
 \usage{
-penalize_square(x)
+penalize_square(x, i)
 
-penalize_inf(x)
+penalize_inf(x, i)
 }
 \arguments{
-\item{x}{Numeric. Edge distance}
+\item{x}{Numeric. All edge distances from the graph}
+
+\item{i}{Integer. The edge indices whose penalized weights will be returned.}
 }
 \value{
-Numeric the same length as \code{x}
+Numeric the same length as \code{i}.
 }
 \description{
 Edge weight penalty functions
 }
+\section{Functions}{
+\itemize{
+\item \code{penalize_square}: Add a constant based on the total edge distance in the graph and then squares the result.
+
+\item \code{penalize_inf}: Make edge distances \code{Inf}
+}}
+

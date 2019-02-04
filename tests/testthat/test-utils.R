@@ -15,3 +15,13 @@ test_that("Interface vertices are detected", {
   expect_equal(ip1, c(585L, 1156L, 885L, 1271L, 1144L, 1152L, 1158L, 1159L, 1160L,
                       1269L, 1247L, 1265L, 1545L, 1546L, 1537L, 1526L))
 })
+
+test_that("Penalty functions work as expected", {
+  psquare <- penalize_square(1:10, c(1, 3))
+  pinf <- penalize_inf(1:10, c(1, 3))
+
+  expect_length(psquare, 2)
+  expect_length(pinf, 2)
+  expect_true(all(psquare > 10^2))
+  expect_true(all(is.infinite(pinf)))
+})
