@@ -1,11 +1,16 @@
-#' Utility function that applies edge and vertex attributes to a graph that will
-#' be used by pathfinder and then later removed.
+#' Utility function that applies edge bundle and distanct attributes to graph
+#'
+#' You will usually not need to call this function directly. [`greedy_search`]
+#' will use it to apply the supplied edge bundle and distance attributes to the
+#' graph. This function is exposed as a convenience in case you wish to access
+#' those attributes on the graph.
 #'
 #' @inheritParams greedy_search
 #'
 #' @return A `pathfinder_graph` object.
 #'
 #' @import assertthat igraph
+#' @export
 decorate_graph <- function(graph, edge_bundles, distances) {
   assert_that(inherits(graph, "igraph"), msg = "pathfinder currently only works with igraph objects")
   assert_that(is.numeric(distances), msg = "distances must be a numeric vector")

@@ -2,8 +2,7 @@
 % Please edit documentation in R/decorators.R
 \name{decorate_graph}
 \alias{decorate_graph}
-\title{Utility function that applies edge and vertex attributes to a graph that will
-be used by pathfinder and then later removed.}
+\title{Utility function that applies edge bundle and distanct attributes to graph}
 \usage{
 decorate_graph(graph, edge_bundles, distances)
 }
@@ -21,6 +20,8 @@ distances of each edge.}
 A \code{pathfinder_graph} object.
 }
 \description{
-Utility function that applies edge and vertex attributes to a graph that will
-be used by pathfinder and then later removed.
+You will usually not need to call this function directly. \code{\link{greedy_search}}
+will use it to apply the supplied edge bundle and distance attributes to the
+graph. This function is exposed as a convenience in case you wish to access
+those attributes on the graph.
 }
