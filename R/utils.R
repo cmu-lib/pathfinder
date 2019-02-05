@@ -9,11 +9,13 @@
 NULL
 
 #' @describeIn penalize Add a constant based on the total edge distance in the graph and then squares the result.
+#' @export
 penalize_square <- function(x, i) {
   ((x[i]) + sum(x))^2
 }
 
 #' @describeIn penalize Make edge distances `Inf`
+#' @export
 penalize_inf <- function(x, i) {
   rep(Inf, times = length(i))
 }
