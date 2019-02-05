@@ -41,7 +41,7 @@ ggraph(lt) +
   geom_edge_link(aes(color = edge_mark, edge_width = !is.na(edge_mark)), alpha = 0.8) +
   scale_edge_color_brewer(palette = "Dark2", na.value = "gray90") +
   scale_edge_width_manual(values = c("TRUE" = 2, "FALSE" = 0.5)) +
-  geom_label_repel(data = path_waypoints, aes(x = x, y = y, label = step)) +
+  geom_text(data = path_waypoints, aes(x = x, y = y, label = step)) +
   theme_graph() +
   coord_map() +
   theme(legend.position = "none")
