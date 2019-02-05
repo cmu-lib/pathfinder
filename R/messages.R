@@ -1,9 +1,4 @@
-#' Any function to send a message will do nothing if quiet = TRUE
 #' @import glue
-#' @name quiet_messaging
-NULL
-
-#' @rdname quiet_messaging
 message_end <- function(quiet, epath) {
   if (quiet) return(invisible())
   message(glue(
@@ -11,7 +6,7 @@ message_end <- function(quiet, epath) {
   ))
 }
 
-#' @rdname quiet_messaging
+#' @import glue
 step_status_message <- function(quiet, starting_point, search_set, is_bundle_crossing, bundle_id) {
   if (quiet) return(invisible())
 
@@ -25,25 +20,25 @@ step_status_message <- function(quiet, starting_point, search_set, is_bundle_cro
   }
 }
 
-#' @rdname quiet_messaging
+#' @import glue
 message_increase <- function(quiet, bundle_edges) {
   if (quiet) return(invisible())
-  message("increasing weights for ", paste(bundle_edges, collapse = ";"))
+  message("Increasing weights for edges: ", paste(bundle_edges, collapse = ";"))
 }
 
-#' @rdname quiet_messaging
+#' @import glue
 message_crossed <- function(quiet, bundles_crossed) {
   if (quiet) return(invisible())
-  message("bundles crossed: ", paste(bundles_crossed, collapse = "; "))
+  message("Bundle IDs crossed: ", paste(bundles_crossed, collapse = "; "))
 }
 
-#' @rdname quiet_messaging
+#' @import glue
 message_removed <- function(quiet, removed_nodes, search_set) {
   if (quiet) return(invisible())
   message(glue("removing nodes {paste(removed_nodes, collapse = '; ')}; {length(search_set)} nodes remaining."))
 }
 
-#' @rdname quiet_messaging
+#' @import glue
 message_none <- function(quiet) {
   if (quiet) return(invisible())
   message("0 bundle candidates, looking for a new point")
