@@ -26,12 +26,15 @@ Imports:
     tibble
 Suggests: 
     covr,
-    testthat,
+    ggplot2,
+    ggraph,
     knitr,
-    rmarkdown
+    rmarkdown,
+    testthat
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
 Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
-VignetteBuilder: knitr
