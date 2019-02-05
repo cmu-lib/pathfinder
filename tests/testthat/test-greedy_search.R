@@ -15,6 +15,11 @@ test_that("greedy_search returns filled list", {
   expect_gt(length(pathway$vpath), 1L)
 })
 
+
+test_that("greedy_search is quiet upon request", {
+  expect_silent(quiet_pathway <- greedy_search(pgh_graph, pgh_bundles, pgh_distances, starting_point = 1L, quiet = TRUE))
+})
+
 test_that("greedy_search works without penalty", {
   expect_message(unpenalized_pathway <- greedy_search(pgh_graph, pgh_bundles, pgh_distances, starting_point = 1L, penalize = FALSE, quiet = FALSE), regexp = "\\d", all = TRUE)
   expect_equivalent(unpenalized_pathway$starting_point, 1L)
