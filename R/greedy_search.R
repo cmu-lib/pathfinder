@@ -89,7 +89,11 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
     class = "pathfinder_path"
   )
 
-  message_end(quiet, epath = pathway$epath)
+  if (pathway$path_is_complete) {
+    message_end(quiet, pathway = pathway)
+  } else if (!pathway$path_is_complete) {
+    message_break(quiet, pathway = pathway)
+  }
   return(pathway)
 }
 
@@ -149,7 +153,7 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
     candidate_distances <- get_candidate_distances(pathfinder_graph, starting_point, candidate_points, candidate_edges, is_bundle_crossing)
 
     if (all(is.infinite(candidate_distances$candidate_distances))) {
-      warning("Not all points reachable. Stopped early.")
+      warning("Not all points reachable. Stopped early.\n")
       return(
         list(
           is_bundle_crossing = is_bundle_crossing,
