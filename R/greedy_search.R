@@ -70,7 +70,6 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
     quiet = quiet
   )
 
-  working_distances <- as.list(q)
   vpath <- as.list(qv)
   epath <- as.list(qe)
   bpath <- as.list(qb)
@@ -83,8 +82,9 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
       edge_bundles = edge_bundles,
       distances = distances,
       starting_point = starting_point,
-      ending_point = pathfinding_results$point,
-      remaining_search_set = pathfinding_results$search_set
+      ending_point = pathfinding_results[["end_point"]],
+      path_is_complete = pathfinding_results[["path_is_complete"]],
+      remaining_search_set = pathfinding_results[["search_set"]]
     ),
     class = "pathfinder_path"
   )
@@ -149,13 +149,12 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
     candidate_distances <- get_candidate_distances(pathfinder_graph, starting_point, candidate_points, candidate_edges, is_bundle_crossing)
 
     if (all(is.infinite(candidate_distances$candidate_distances))) {
-      warning("Not all points reachable. Stopped early")
+      warning("Not all points reachable. Stopped early.")
       return(
         list(
           is_bundle_crossing = is_bundle_crossing,
-          break_reason = "Stopped early, not all points reachable",
-          point = starting_point,
-          candidates = candidate_points,
+          path_is_complete = FALSE,
+          end_point = starting_point,
           search_set = search_set
         )
       )
@@ -212,9 +211,8 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
   return(
     list(
       is_bundle_crossing = is_bundle_crossing,
-      break_reason = "All paths done",
-      point = starting_point,
-      candidates = candidate_points,
+      path_is_complete = TRUE,
+      end_point = starting_point,
       search_set = search_set
     )
   )

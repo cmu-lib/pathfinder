@@ -13,6 +13,7 @@ test_that("greedy_search returns filled list", {
   expect_equivalent(pathway$remaining_search_set, integer(0))
   expect_gt(length(pathway$epath), 1L)
   expect_gt(length(pathway$vpath), 1L)
+  expect_true(pathway$path_is_complete)
 })
 
 
@@ -26,6 +27,7 @@ test_that("greedy_search works without penalty", {
   expect_equivalent(unpenalized_pathway$remaining_search_set, integer(0))
   expect_gt(length(unpenalized_pathway$epath), 1L)
   expect_gt(length(unpenalized_pathway$vpath), 1L)
+  expect_true(unpenalized_pathway$path_is_complete)
 })
 
 
@@ -36,6 +38,7 @@ test_that("greedy_search works with infinte penalty", {
   expect_gt(length(inf_pathway$epath), 1L)
   expect_gt(length(inf_pathway$vpath), 1L)
   expect_equivalent(anyDuplicated(unlist(inf_pathway$bpath)), 0)
+  expect_false(inf_pathway$path_is_complete)
 })
 
 test_that("bad penalty function raises error", {
