@@ -17,8 +17,6 @@ knitr::opts_chunk$set(
 ```
 
 ```{r}
-library(ggraph)
-library(ggplot2)
 library(pathfinder)
 
 pathway <- greedy_search(pgh_graph, edge_bundles = pgh_bundles, distances = pgh_distances, quiet = TRUE)
@@ -27,22 +25,15 @@ plot_graph <- decorate_graph(pgh_graph, pgh_bundles, pgh_distances)
 ```
 
 ```{r}
-E(plot_graph)$edge_mark <- NA_character_
+E(plot_graph)$edge_mark <- "road"
 E(plot_graph)$edge_mark[unique_pathway_edges(pathway)] <- "path"
 E(plot_graph)$edge_mark[which(!is.na(E(plot_graph)$pathfinder.bundle_id))] <- "bundled"
 E(plot_graph)$edge_mark <- as.factor(E(plot_graph)$edge_mark)
-lt <- create_layout(plot_graph, "manual", node.positions = tibble::tibble(x = V(plot_graph)$lon, y = V(plot_graph)$lat))
 
-path_waypoints <- pathway_steps(pathway)
-path_waypoints$x <- lt$x[path_waypoints$node_id]
-path_waypoints$y <- lt$y[path_waypoints$node_id]
+pl <- norm_coords(cbind(V(plot_graph)$lon, V(plot_graph)$lat))
 
-ggraph(lt) +
-  geom_edge_link(aes(color = edge_mark, edge_width = !is.na(edge_mark)), alpha = 0.8) +
-  scale_edge_color_brewer(palette = "Dark2", na.value = "gray90") +
-  scale_edge_width_manual(values = c("TRUE" = 2, "FALSE" = 0.5)) +
-  geom_text(data = path_waypoints, aes(x = x, y = y, label = step)) +
-  theme_graph() +
-  coord_map() +
-  theme(legend.position = "none")
+plot(plot_graph, layout = pl,
+     vertex.label = NA, edge.label = NA, vertex.shape = "none", edge.arrow.size = 0, edge.color = E(plot_graph)$edge_mark,
+     edge.curved = FALSE,
+     palette = palette(c("red", "blue", "gray90")))
 ```
