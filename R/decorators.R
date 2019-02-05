@@ -1,4 +1,4 @@
-#' Utility function that applies edge bundle and distanct attributes to graph
+#' Utility function that applies edge bundle and distance attributes to graph
 #'
 #' You will usually not need to call this function directly. [`greedy_search`]
 #' will use it to apply the supplied edge bundle and distance attributes to the

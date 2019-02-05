@@ -9,7 +9,7 @@ status](https://travis-ci.org/dSHARP-CMU/pathfinder.svg?branch=master)](https://
 status](https://codecov.io/gh/dSHARP-CMU/pathfinder/branch/master/graph/badge.svg)](https://codecov.io/github/dSHARP-CMU/pathfinder?branch=master)
 
 The goal of pathfinder is to find a path across multiple edge bundles in
-a graph that minimizes the nubmer of times each bundle is traversed.
+a graph that minimizes the number of times each bundle is traversed.
 
 ## Installation
 
@@ -25,17 +25,6 @@ Starting with an igraph object, specify edge bundles that must be
 traversed by using a list of edge indices:
 
 ``` r
-library(pathfinder)
-#> Loading required package: igraph
-#> 
-#> Attaching package: 'igraph'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     decompose, spectrum
-#> The following object is masked from 'package:base':
-#> 
-#>     union
-
 # A small subset of road data from Pittsburgh
 pgh_graph
 #> IGRAPH 6aae588 DN-- 2370 5272 -- 
@@ -92,48 +81,28 @@ pgh_bundles
 #> [1] 3685 3686
 ```
 
-`greedy_search()` will traverse teh graph by jumping from closest edge
-bundle to closest edge bundle. By setting `penalize = TRUE` you can add
-a sever edge weight penalty to crossed bundles to disincentivize
-crossing bundles more than
+`greedy_search()` will traverse the graph by walking a path from the
+starting vertex to the nearest edge bundle, crossing that bundle, then
+finding the next closest bundle, until all bundles have been crossed at
+least once. By setting `penalize = TRUE` you can add a severe edge
+weight penalty to crossed bundles to discourage crossing bundles more
+than
 once.
 
 ``` r
-penalized_run <- greedy_search(pgh_graph, edge_bundles = pgh_bundles, distances = pgh_distances)
-#> Bundles 4 recrossed!
+penalized_run <- greedy_search(pgh_graph, edge_bundles = pgh_bundles, distances = pgh_distances, penalize = TRUE)
 ```
 
+It’s also possible to supply penalty functions that will completely
+prohibit recrossing edge bundles, however this may result in incomplete
+paths that get
+trapped.
+
 ``` r
-glance(penalized_run)
-#> # A tibble: 1 x 8
-#>   n_steps starting_point ending_point total_distance mean_times_cros…
-#>     <int>          <dbl>        <int>          <dbl>            <dbl>
-#> 1      12              1          885          6970.             1.17
-#> # … with 3 more variables: max_times_crossed <int>,
-#> #   bundle_most_crossed <int>, p_multiple_crossed <dbl>
-tidy(penalized_run)
-#> # A tibble: 6 x 2
-#>   bundle_id     n
-#>       <int> <int>
-#> 1         1     1
-#> 2         2     1
-#> 3         3     1
-#> 4         4     2
-#> 5         5     1
-#> 6         6     1
-augment(penalized_run)
-#> # A tibble: 160 x 6
-#>    index step_id edge_id bundle_id times_edge_crossed times_bundle_crossed
-#>    <int>   <int>   <int>     <int>              <int>                <int>
-#>  1     1       1       2        NA                  1                    0
-#>  2     2       1     542        NA                  1                    0
-#>  3     3       1     879        NA                  1                    0
-#>  4     4       1    2678        NA                  1                    0
-#>  5     5       1    2166        NA                  1                    0
-#>  6     6       1    2949        NA                  1                    0
-#>  7     7       1    5232        NA                  1                    0
-#>  8     8       1     330        NA                  1                    0
-#>  9     9       1    2473        NA                  1                    0
-#> 10    10       1    4139        NA                  1                    0
-#> # … with 150 more rows
+infinite_run <- greedy_search(pgh_graph, edge_bundles = pgh_bundles, distances = pgh_distances, penalize = TRUE, penalty_fun = penalize_inf)
+#> Warning in greedy_search_handler(pathfinder_graph = pathfinder_graph, starting_point = starting_point, : Not all points reachable. Stopped early.
 ```
+
+Tidying methods are also available to get summary statistics on
+resulting pathways at different levels of resolution. For more info, see
+`?glance`, `?tidy`, `?augment`

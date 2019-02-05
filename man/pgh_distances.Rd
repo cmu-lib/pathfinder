@@ -3,7 +3,7 @@
 \docType{data}
 \name{pgh_distances}
 \alias{pgh_distances}
-\title{Pitsburgh edge distances}
+\title{Pittsburgh edge distances}
 \format{A numeric vector of edge distances for \link{pgh_graph} in meters.}
 \source{
 \href{https://www.openstreetmap.org}{OpenStreetMap}, available under the Open Database License, © OpenStreetMap contributors.
@@ -12,6 +12,6 @@
 pgh_distances
 }
 \description{
-Pitsburgh edge distances
+Pittsburgh edge distances
 }
 \keyword{datasets}

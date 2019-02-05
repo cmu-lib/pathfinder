@@ -1,11 +1,11 @@
-#' Pitsburgh road network
+#' Pittsburgh road network
 #'
 #' @format An [igraph::igraph] object containing a sample of street network data from Pittsburgh.
 #'
 #' @source [OpenStreetMap](https://www.openstreetmap.org), available under the Open Database License, © OpenStreetMap contributors.
 "pgh_graph"
 
-#' Pitsburgh bridge bundles
+#' Pittsburgh bridge bundles
 #'
 #' Each vector groups edge indices belonging to the same bridge.
 #'
@@ -15,7 +15,7 @@
 "pgh_bundles"
 
 
-#' Pitsburgh edge distances
+#' Pittsburgh edge distances
 #'
 #' @format A numeric vector of edge distances for [pgh_graph] in meters.
 #'

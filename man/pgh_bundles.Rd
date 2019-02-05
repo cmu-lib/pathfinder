@@ -3,7 +3,7 @@
 \docType{data}
 \name{pgh_bundles}
 \alias{pgh_bundles}
-\title{Pitsburgh bridge bundles}
+\title{Pittsburgh bridge bundles}
 \format{A list of edge index vectors from \link{pgh_graph}.}
 \source{
 \href{https://www.openstreetmap.org}{OpenStreetMap}, available under the Open Database License, © OpenStreetMap contributors.

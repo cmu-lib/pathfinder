@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{get_interface_points}
 \alias{get_interface_points}
-\title{Find the vertices in a graph thatwhere bundled and non-bundled edges are tangent}
+\title{Find the vertices in a graph where bundled and non-bundled edges are tangent}
 \usage{
 get_interface_points(graph, edge_bundles)
 }
@@ -14,5 +14,5 @@ considered one edge bundle, and each vector the edge indices belonging to
 that bundle.}
 }
 \description{
-Find the vertices in a graph thatwhere bundled and non-bundled edges are tangent
+Find the vertices in a graph where bundled and non-bundled edges are tangent
 }

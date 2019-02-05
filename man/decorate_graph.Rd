@@ -2,7 +2,7 @@
 % Please edit documentation in R/decorators.R
 \name{decorate_graph}
 \alias{decorate_graph}
-\title{Utility function that applies edge bundle and distanct attributes to graph}
+\title{Utility function that applies edge bundle and distance attributes to graph}
 \usage{
 decorate_graph(graph, edge_bundles, distances)
 }

@@ -38,9 +38,9 @@ A \code{pathfinder} object, which is a list with the following elements:
 \itemize{
 \item \code{epath}: A list of integer vectors representing the successive edges
 crossed by the path
-\item \code{vpath}: A list of integer vectors representing the sucessive vertices
+\item \code{vpath}: A list of integer vectors representing the successive vertices
 crossed by the path
-\item \code{bpath}: A list of integer vectors representing the sucessive edge bundles
+\item \code{bpath}: A list of integer vectors representing the successive edge bundles
 crossed by the path
 }
 }
@@ -51,7 +51,7 @@ the next closest bundle, and so on, until at least one edge in each of the
 specified bundles has been visited.
 }
 \details{
-The penalty function will make crossing any edge in an already-corssed bundle
+The penalty function will make crossing any edge in an already-crossed bundle
 extremely unattractive to the pathfinding function. By setting the edge
 distance to a very high, but still finite, number, this will allow the path
 to cross and already-traversed edge bundle again if there are no other

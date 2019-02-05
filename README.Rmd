@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 [![Travis build status](https://travis-ci.org/dSHARP-CMU/pathfinder.svg?branch=master)](https://travis-ci.org/dSHARP-CMU/pathfinder)
 [![Coverage status](https://codecov.io/gh/dSHARP-CMU/pathfinder/branch/master/graph/badge.svg)](https://codecov.io/github/dSHARP-CMU/pathfinder?branch=master)
   
-The goal of pathfinder is to find a path across multiple edge bundles in a graph that minimizes the nubmer of times each bundle is traversed.
+The goal of pathfinder is to find a path across multiple edge bundles in a graph that minimizes the number of times each bundle is traversed.
 
 ## Installation
 
@@ -32,9 +32,11 @@ devtools::install_github("dSHARP-CMU/pathfinder")
 
 Starting with an igraph object, specify edge bundles that must be traversed by using a list of edge indices:
 
-```{r}
+```{r, include = FALSE}
 library(pathfinder)
+```
 
+```{r}
 # A small subset of road data from Pittsburgh
 pgh_graph
 
@@ -44,15 +46,17 @@ pgh_distances
 pgh_bundles
 ```
 
-`greedy_search()` will traverse teh graph by jumping from closest edge bundle to closest edge bundle.
-By setting `penalize = TRUE` you can add a sever edge weight penalty to crossed bundles to disincentivize crossing bundles more than once.
+`greedy_search()` will traverse the graph by walking a path from the starting vertex to the nearest edge bundle, crossing that bundle, then finding the next closest bundle, until all bundles have been crossed at least once.
+By setting `penalize = TRUE` you can add a severe edge weight penalty to crossed bundles to discourage crossing bundles more than once.
 
 ```{r}
-penalized_run <- greedy_search(pgh_graph, edge_bundles = pgh_bundles, distances = pgh_distances)
+penalized_run <- greedy_search(pgh_graph, edge_bundles = pgh_bundles, distances = pgh_distances, penalize = TRUE)
 ```
 
+It's also possible to supply penalty functions that will completely prohibit recrossing edge bundles, however this may result in incomplete paths that get trapped.
+
 ```{r}
-glance(penalized_run)
-tidy(penalized_run)
-augment(penalized_run)
+infinite_run <- greedy_search(pgh_graph, edge_bundles = pgh_bundles, distances = pgh_distances, penalize = TRUE, penalty_fun = penalize_inf)
 ```
+
+Tidying methods are also available to get summary statistics on resulting pathways at different levels of resolution. For more info, see `?glance`, `?tidy`, `?augment`

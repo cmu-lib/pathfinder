@@ -27,7 +27,7 @@ get_bundled_edges <- function(edge_bundles) {
   res
 }
 
-#' Find the vertices in a graph thatwhere bundled and non-bundled edges are tangent
+#' Find the vertices in a graph where bundled and non-bundled edges are tangent
 #'
 #' @inheritParams greedy_search
 #'
