@@ -88,6 +88,7 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
       is_bundle_crossing = pathfinding_results[["is_bundle_crossing"]],
       graph_state = pathfinding_results[["graph_state"]],
       candidate_points = pathfinding_results[["candidate_points"]],
+      candidate_edges = pathfinding_results[["candidate_edges"]],
       candidate_distances = pathfinding_results[["candidate_distances"]]
     ),
     class = "pathfinder_path"
