@@ -73,9 +73,6 @@ tidy <- function(pathway) {
 #' @export
 augment <- function(pathway) {
   assertthat::assert_that(inherits(pathway, "pathfinder_path"))
-  suppressPackageStartupMessages({
-    assertthat::assert_that(require(dplyr), msg = "augment() requires dplyr")
-  })
 
   all_edges <- unlist(pathway$epath)
   step_id <- unlist(mapply(function(e, i) rep(i, times = length(e)), pathway$epath, seq_along(pathway$epath)))
@@ -110,4 +107,28 @@ bundle_cross_count <- function(bpath) {
   res$bundle_id <- as.integer(as.character(res$bundle_id))
   res$n <- as.integer(res$n)
   res
+}
+
+#' Get pathway data
+#'
+#' @inheritParams glance
+#' @name pathway
+NULL
+
+#' @describeIn pathway Get unique edges visited by pathway
+#' @export
+unique_pathway_edges <- function(pathway) {
+  assert_that(inherits(pathway, "pathfinder_path"))
+  unique(unlist(pathway$epath))
+}
+
+#' @describeIn pathway Get a list of the nodes visited by a pathway
+#' @export
+pathway_steps <- function(pathway) {
+  assert_that(inherits(pathway, "pathfinder_path"))
+  res <- vapply(pathway$vpath, function(x) utils::head(x, 1), FUN.VALUE = integer(1))
+  tibble::tibble(
+    node_id = res,
+    step = seq_along(res)
+  )
 }
