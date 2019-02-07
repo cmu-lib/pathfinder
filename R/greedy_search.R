@@ -128,7 +128,7 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
 # until it can find no further paths to take.
 #
 #' @import igraph dequer
-greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, penalize, penalty_fun = penalize_square, quiet) {
+greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, penalize, penalty_fun, quiet) {
   assertthat::assert_that(inherits(pathfinder_graph, "pathfinder_graph"),
     msg = "graph must be decorated with pathfinder attributes. Call decorate_graph() first."
   )
