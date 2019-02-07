@@ -84,7 +84,11 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
       starting_point = starting_point,
       ending_point = pathfinding_results[["end_point"]],
       path_is_complete = pathfinding_results[["path_is_complete"]],
-      remaining_search_set = pathfinding_results[["search_set"]]
+      remaining_search_set = pathfinding_results[["search_set"]],
+      is_bundle_crossing = pathfinding_results[["is_bundle_crossing"]],
+      graph_state = pathfinding_results[["graph_state"]],
+      candidate_points = pathfinding_results[["candidate_points"]],
+      candidate_distances = pathfinding_results[["candidate_distances"]]
     ),
     class = "pathfinder_path"
   )
@@ -159,7 +163,10 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
           is_bundle_crossing = is_bundle_crossing,
           path_is_complete = FALSE,
           end_point = starting_point,
-          search_set = search_set
+          search_set = search_set,
+          graph_state = pathfinder_graph,
+          candidate_points = candidate_points,
+          candidate_distances = candidate_distances
         )
       )
     }
@@ -217,7 +224,10 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
       is_bundle_crossing = is_bundle_crossing,
       path_is_complete = TRUE,
       end_point = starting_point,
-      search_set = search_set
+      search_set = search_set,
+      graph_state = pathfinder_graph,
+      candidate_points = candidate_points,
+      candidate_distances = candidate_distances
     )
   )
 }
