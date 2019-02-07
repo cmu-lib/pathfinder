@@ -11,7 +11,7 @@
 #' to cross and already-traversed edge bundle again if there are no other
 #' options available.
 #'
-#' @param graph An [igraph::igraph] object.
+#' @param graph An [`igraph`] object.
 #' @param starting_point Integer. Index of the point from which to start the
 #'   search.
 #' @param edge_bundles A list of integer vectors. Each list item will be
@@ -23,8 +23,8 @@
 #'   bundles to discourage crossing the same bundles more than once?
 #' @param penalty_fun A function to penalize the weights of all edges in a
 #'   bundle any time at least one edge in that bundle is traversed. Defaults to
-#'   [`penalty_square`], however can be set to [`penalty_inf`] to set weight to
-#'   `Inf` and thus forbid recrossing a bundle. Using [`penalty_inf`] can result
+#'   [`penalize_square`], however can be set to [`penalize_inf`] to set weight to
+#'   `Inf` and thus forbid recrossing a bundle. Using [`penalize_inf`] can result
 #'   in an incomplete path. See [`penalize`] for guidance on supplying your own
 #'   function. Ignored if `penalize = FALSE`.
 #' @param quiet Boolean. Display progress?
@@ -98,30 +98,30 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
 }
 
 
-#' Pathfinding handler
-#'
-#' Primary recursive function that steps through the graph. This function has two
-#' modes depending on the value of is_bundle_crossing:
-#'
-#' - If TRUE, the function tries to cross the the farthest node THAT BELONGS TO
-#' THE SAME bundle, almost always ensuring that it successfully crosses the
-#' bundle.
-#'
-#' - If FALSE, the function looks for the next nearest point that is the entry
-#' point for a bundle, and takes that path.
-#'
-#' Regardless of which mode the function is using, it saves both the node & edge
-#' paths to the queues, and then checks which bundles have been crossed by the
-#' path it just took. For those bundles, it 1) increases ALL the bundle edge
-#' weights (not just the weights of the bundles crossed) by squaring them, making
-#' them exponentially less-attractive for future crossings; and 2) removes any of
-#' the associated nodes for that bundle from the remaining set of nodes to be
-#' visited.
-#'
-#' After this, it passes the newly reweighted graph and the new starting point to
-#' itself, and flips its mode. It will recurse until search_set is empty, or
-#' until it can find no further paths to take.
-#'
+# Pathfinding handler
+#
+# Primary recursive function that steps through the graph. This function has two
+# modes depending on the value of is_bundle_crossing:
+#
+# - If TRUE, the function tries to cross the the farthest node THAT BELONGS TO
+# THE SAME bundle, almost always ensuring that it successfully crosses the
+# bundle.
+#
+# - If FALSE, the function looks for the next nearest point that is the entry
+# point for a bundle, and takes that path.
+#
+# Regardless of which mode the function is using, it saves both the node & edge
+# paths to the queues, and then checks which bundles have been crossed by the
+# path it just took. For those bundles, it 1) increases ALL the bundle edge
+# weights (not just the weights of the bundles crossed) by squaring them, making
+# them exponentially less-attractive for future crossings; and 2) removes any of
+# the associated nodes for that bundle from the remaining set of nodes to be
+# visited.
+#
+# After this, it passes the newly reweighted graph and the new starting point to
+# itself, and flips its mode. It will recurse until search_set is empty, or
+# until it can find no further paths to take.
+#
 #' @import igraph dequer
 greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, penalize, penalty_fun = penalize_square, quiet) {
   assertthat::assert_that(inherits(pathfinder_graph, "pathfinder_graph"),

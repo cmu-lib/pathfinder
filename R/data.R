@@ -1,6 +1,6 @@
 #' Pittsburgh road network
 #'
-#' @format An [igraph::igraph] object containing a sample of street network data from Pittsburgh.
+#' @format An [`igraph`] object containing a sample of street network data from Pittsburgh.
 #'
 #' @source [OpenStreetMap](https://www.openstreetmap.org), available under the Open Database License, © OpenStreetMap contributors.
 "pgh_graph"

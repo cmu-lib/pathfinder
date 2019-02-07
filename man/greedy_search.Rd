@@ -9,7 +9,7 @@ greedy_search(graph, edge_bundles, distances, starting_point = 1,
   quiet = !interactive())
 }
 \arguments{
-\item{graph}{An \link[igraph:igraph]{igraph::igraph} object.}
+\item{graph}{An \code{\link{igraph}} object.}
 
 \item{edge_bundles}{A list of integer vectors. Each list item will be
 considered one edge bundle, and each vector the edge indices belonging to
@@ -26,8 +26,8 @@ bundles to discourage crossing the same bundles more than once?}
 
 \item{penalty_fun}{A function to penalize the weights of all edges in a
 bundle any time at least one edge in that bundle is traversed. Defaults to
-\code{\link{penalty_square}}, however can be set to \code{\link{penalty_inf}} to set weight to
-\code{Inf} and thus forbid recrossing a bundle. Using \code{\link{penalty_inf}} can result
+\code{\link{penalize_square}}, however can be set to \code{\link{penalize_inf}} to set weight to
+\code{Inf} and thus forbid recrossing a bundle. Using \code{\link{penalize_inf}} can result
 in an incomplete path. See \code{\link{penalize}} for guidance on supplying your own
 function. Ignored if \code{penalize = FALSE}.}
 

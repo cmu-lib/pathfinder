@@ -4,7 +4,7 @@
 \name{pgh_graph}
 \alias{pgh_graph}
 \title{Pittsburgh road network}
-\format{An \link[igraph:igraph]{igraph::igraph} object containing a sample of street network data from Pittsburgh.}
+\format{An \code{\link{igraph}} object containing a sample of street network data from Pittsburgh.}
 \source{
 \href{https://www.openstreetmap.org}{OpenStreetMap}, available under the Open Database License, © OpenStreetMap contributors.
 }

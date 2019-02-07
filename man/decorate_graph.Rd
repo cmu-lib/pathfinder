@@ -7,7 +7,7 @@
 decorate_graph(graph, edge_bundles, distances)
 }
 \arguments{
-\item{graph}{An \link[igraph:igraph]{igraph::igraph} object.}
+\item{graph}{An \code{\link{igraph}} object.}
 
 \item{edge_bundles}{A list of integer vectors. Each list item will be
 considered one edge bundle, and each vector the edge indices belonging to
