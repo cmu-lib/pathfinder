@@ -166,7 +166,8 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
           search_set = search_set,
           graph_state = pathfinder_graph,
           candidate_points = candidate_points,
-          candidate_distances = candidate_distances
+          candidate_edges = candidate_edges,
+          candidate_distances = candidate_distances$candidate_distances
         )
       )
     }
@@ -227,7 +228,8 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
       search_set = search_set,
       graph_state = pathfinder_graph,
       candidate_points = candidate_points,
-      candidate_distances = candidate_distances
+      candidate_edges = candidate_edges,
+      candidate_distances = candidate_distances$candidate_distances
     )
   )
 }
