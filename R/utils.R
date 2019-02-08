@@ -9,9 +9,12 @@
 NULL
 
 #' @describeIn penalize Add a constant based on the total edge distance in the graph and then squares the result.
+#' @import assertthat
 #' @export
 penalize_square <- function(x, i) {
-  ((x[i]) + sum(x))^2
+  res <- ((x[i]) + 1000)^2
+  assert_that(all(is.finite(res)), msg = "All return values form penalize_square must be finite")
+  res
 }
 
 #' @describeIn penalize Make edge distances `Inf`
