@@ -184,10 +184,10 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
     pushback(qv, vpath)
 
     bundles_crossed <- stats::na.omit(unique(edge_attr(pathfinder_graph, "pathfinder.bundle_id", index = epath)))
+    # Any bundles crossed get added to the queue
+    pushback(qb, bundles_crossed)
 
     if (length(bundles_crossed) > 0) {
-      # Any bundles crossed get added to the queue
-      pushback(qb, bundles_crossed)
       message_crossed(quiet, bundles_crossed)
 
       bundle_edges <- which(edge_attr(pathfinder_graph, "pathfinder.bundle_id") %in% bundles_crossed)
