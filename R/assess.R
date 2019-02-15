@@ -86,20 +86,20 @@ augment <- function(pathway) {
     index,
     step_id,
     edge_id,
-    bundle_id
-  ) %>%
-    mutate(
-      # True for any step that crosses onto a bridge from either a non-bridge or a different bridge
-      bundle_switch = !is.na(bundle_id) & (is.na(lag(bundle_id)) | (lag(bundle_id) != bundle_id))
-    ) %>%
+    bundle_id)
+
+  # Count up distinct times a bridge is crossed for each step
+  bridge_steps <- res %>%
+    filter(!is.na(bundle_id)) %>%
+    distinct(step_id, bundle_id) %>%
+    group_by(bundle_id) %>%
+    mutate(times_bundle_crossed = row_number()) %>%
+    ungroup()
+
+  res %>%
     group_by(edge_id) %>%
     mutate(times_edge_crossed = row_number()) %>%
-    group_by(bundle_id) %>%
-    mutate(times_bundle_crossed = cumsum(bundle_switch)) %>%
-    ungroup() %>%
-    select(-bundle_switch)
-
-  return(res)
+    left_join(bridge_steps, by = c("step_id", "bundle_id"))
 }
 
 bundle_cross_count <- function(bpath) {
