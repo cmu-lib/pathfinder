@@ -22,7 +22,6 @@ Imports:
     dplyr,
     glue,
     magrittr,
-    purrr,
     tibble
 Suggests: 
     covr,
