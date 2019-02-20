@@ -68,7 +68,7 @@ tidy <- function(pathway) {
 #'   - `bundle_id` Id of bundle crossed in this step (`NA` if edge is not a bundle)
 #'   - `times_edge_crossed` Cumulative times this edge has been crossed since the start of the path
 #'   - `times_bundle_crossed` Cumulative times this bundle has been crossed since the start of the path
-#' @importFrom dplyr mutate group_by ungroup select lag row_number
+#' @importFrom dplyr filter mutate group_by ungroup select lag row_number distinct left_join
 #' @import magrittr
 #' @export
 augment <- function(pathway) {
