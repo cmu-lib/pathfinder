@@ -235,6 +235,8 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
   )
 }
 
+utils::globalVariables(".from")
+
 get_candidate_points <- function(pathfinder_graph, starting_point, search_set, is_bundle_crossing, crossed_bundles) {
   if (is_bundle_crossing) {
     # Get first uncrossed bundle that goes from this node. This logic is
