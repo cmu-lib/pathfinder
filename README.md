@@ -41,24 +41,10 @@ pgh_graph
 #> + ... omitted several edges
 
 pgh_distances
-#>   [1]  72.085183 175.888347  17.915673  72.085183  48.698138 127.009269
-#>   [7]  48.698138 124.129447  53.534183 124.129447 174.141060  38.016235
-#>  [13] 160.204296  49.830450  38.016235  41.572786 113.033133  41.572786
-#>  [19]  46.552684 152.570640  49.833105  46.552684  47.849883 116.781708
-#>  [25]  47.849883  46.385455  48.559679  46.385455  32.272382  49.021601
-#>  [31] 116.781708 113.033133  76.333319  48.899350  76.333319  15.548177
-#>  [37]   8.943212   3.699507   3.530424  44.029061  51.182060  49.230732
-#>  [43]  42.271114 100.837279  42.271114  41.673987 105.822951 100.837279
-#>  [49]  43.644899  50.846476  13.315098  43.644899  43.514411  51.525894
-#>  [55]  43.514411  47.049973  11.626941 104.570919 121.503683  50.166166
-#>  [61] 104.570919  49.143080 123.475677  38.145321  79.797690  63.128221
-#>  [67]  38.145321  47.869854  64.966673  82.337796  47.869854   7.768423
-#>  [73]  80.559962  47.888624  47.888624  53.260418  52.986123  82.969409
-#>  [79]  52.750943  52.986123  52.260710  60.464955  51.940961  52.260710
-#>  [85]  44.098179  52.763596 261.042196  27.025030  33.463659  52.763596
-#>  [91] 127.389466  19.400097  32.272382  49.021601  67.025557   5.111531
-#>  [97]  26.041358  48.619924  32.195773  34.663925
-#>  [ reached getOption("max.print") -- omitted 5172 entries ]
+#>  [1]  72.08518 175.88835  17.91567  72.08518  48.69814 127.00927  48.69814
+#>  [8] 124.12945  53.53418 124.12945 174.14106  38.01624 160.20430  49.83045
+#> [15]  38.01624  41.57279 113.03313  41.57279  46.55268 152.57064
+#>  [ reached getOption("max.print") -- omitted 5252 entries ]
 
 # Edges belonging to Pittsburgh bridges
 pgh_bundles
@@ -86,23 +72,50 @@ starting vertex to the nearest edge bundle, crossing that bundle, then
 finding the next closest bundle, until all bundles have been crossed at
 least once. By setting `penalize = TRUE` you can add a severe edge
 weight penalty to crossed bundles to discourage crossing bundles more
-than
-once.
+than once.
 
 ``` r
-penalized_run <- greedy_search(pgh_graph, edge_bundles = pgh_bundles, distances = pgh_distances, penalize = TRUE)
+penalized_run <- greedy_search(pgh_graph, 
+                               edge_bundles = pgh_bundles, 
+                               distances = pgh_distances, 
+                               penalize = TRUE)
 ```
+
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
 
 It’s also possible to supply penalty functions that will completely
 prohibit recrossing edge bundles, however this may result in incomplete
-paths that get
-trapped.
+paths that get trapped.
 
 ``` r
-infinite_run <- greedy_search(pgh_graph, edge_bundles = pgh_bundles, distances = pgh_distances, penalize = TRUE, penalty_fun = penalize_inf)
+infinite_run <- greedy_search(pgh_graph, 
+                              edge_bundles = pgh_bundles, 
+                              distances = pgh_distances, 
+                              penalize = TRUE, 
+                              penalty_fun = penalize_inf)
 #> Warning in greedy_search_handler(pathfinder_graph = pathfinder_graph, starting_point = starting_point, : Not all points reachable. Stopped early.
 ```
 
 Tidying methods are also available to get summary statistics on
-resulting pathways at different levels of resolution. For more info, see
-`?glance`, `?tidy`, `?augment`
+resulting pathways at different levels of resolution.
+
+``` r
+augment(penalized_run)
+#> # A tibble: 160 x 6
+#> # Groups:   edge_id [?]
+#>    index step_id edge_id bundle_id times_edge_crossed times_bundle_crossed
+#>    <int>   <int>   <int>     <int>              <int>                <int>
+#>  1     1       1       2        NA                  1                   NA
+#>  2     2       1     542        NA                  1                   NA
+#>  3     3       1     879        NA                  1                   NA
+#>  4     4       1    2678        NA                  1                   NA
+#>  5     5       1    2166        NA                  1                   NA
+#>  6     6       1    2949        NA                  1                   NA
+#>  7     7       1    5232        NA                  1                   NA
+#>  8     8       1     330        NA                  1                   NA
+#>  9     9       1    2473        NA                  1                   NA
+#> 10    10       1    4139        NA                  1                   NA
+#> # … with 150 more rows
+```
+
+For more info, see `?glance`, `?tidy`, `?augment`
