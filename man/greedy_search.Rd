@@ -34,7 +34,7 @@ function. Ignored if \code{penalize = FALSE}.}
 \item{quiet}{Boolean. Display progress?}
 }
 \value{
-A \code{pathfinder} object, which is a list with the following elements:
+A \code{pathfinder_path} object, which is a list with the following elements:
 \itemize{
 \item \code{epath}: A list of integer vectors representing the successive edges
 crossed by the path

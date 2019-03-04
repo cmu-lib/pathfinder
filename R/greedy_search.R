@@ -31,7 +31,7 @@
 #'
 #' @import assertthat
 #'
-#' @return A `pathfinder` object, which is a list with the following elements:
+#' @return A `pathfinder_path` object, which is a list with the following elements:
 #' - `epath`: A list of integer vectors representing the successive edges
 #' crossed by the path
 #' - `vpath`: A list of integer vectors representing the successive vertices
