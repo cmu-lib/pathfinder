@@ -30,6 +30,8 @@ glance <- function(pathway) {
   mean_times_crossed <- mean(times_bundles_crossed$n)
   p_multiple_crossed <- sum(times_bundles_crossed$n > 1) / length(times_bundles_crossed$n)
 
+  steps_cheated <- sum(unlist(pathway$cheated))
+
   tibble::tibble(
     n_steps,
     starting_point,
@@ -38,7 +40,8 @@ glance <- function(pathway) {
     mean_times_crossed,
     max_times_crossed,
     bundle_most_crossed,
-    p_multiple_crossed
+    p_multiple_crossed,
+    steps_cheated
   )
 }
 
@@ -76,7 +79,9 @@ augment <- function(pathway) {
 
   all_edges <- unlist(pathway$epath)
   step_id <- unlist(mapply(function(e, i) rep(i, times = length(e)), pathway$epath, seq_along(pathway$epath)))
+  cheated_path <- unlist(mapply(function(e, ch) rep(ch, times = length(e)), pathway$epath, pathway$cheated))
   bundled_edges <- get_bundled_edges(pathway$edge_bundles)
+
 
   index <- seq_along(all_edges)
   edge_id <- all_edges
@@ -86,7 +91,8 @@ augment <- function(pathway) {
     index,
     step_id,
     edge_id,
-    bundle_id)
+    bundle_id,
+    cheated_path)
 
   # Count up distinct times a bridge is crossed for each step
   bridge_steps <- res %>%

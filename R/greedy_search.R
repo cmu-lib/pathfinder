@@ -50,11 +50,12 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
   assert_that(is.flag(penalize))
   assert_that(is.flag(quiet))
 
-  # Create queues to hold edgelist, nodelist, and bundlelist, since we don't know
-  # how long they need to be ahead of time.
+  # Create queues to hold edgelist, nodelist, bundlelist, and cheatlist since we
+  # don't know how long they need to be ahead of time.
   qe <- dequer::queue()
   qv <- dequer::queue()
   qb <- dequer::queue()
+  qc <- dequer::queue()
 
   # Collect all interface points on graph that will potentially need to be visited
   search_set <- which(vertex_attr(pathfinder_graph, "pathfinder.interface"))
@@ -66,7 +67,7 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
     pathfinder_graph = pathfinder_graph,
     starting_point = starting_point,
     search_set = search_set,
-    qe = qe, qv = qv, qb = qb,
+    qe = qe, qv = qv, qb = qb, qc = qc,
     is_bundle_crossing = is_edge_bundle,
     penalize = penalize,
     penalty_fun = penalty_fun,
@@ -77,12 +78,14 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
   vpath <- as.list(qv)
   epath <- as.list(qe)
   bpath <- as.list(qb)
+  cpath <- as.list(qc)
 
   pathway <- structure(
     list(
       epath = epath,
       vpath = vpath,
       bpath = bpath,
+      cheated = cpath,
       edge_bundles = edge_bundles,
       distances = distances,
       starting_point = starting_point,
@@ -132,7 +135,7 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
 # until it can find no further paths to take.
 #
 #' @import igraph dequer
-greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, penalize, penalty_fun, cheat, quiet) {
+greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, qc, is_bundle_crossing, penalize, penalty_fun, cheat, quiet) {
   assertthat::assert_that(inherits(pathfinder_graph, "pathfinder_graph"),
     msg = "graph must be decorated with pathfinder attributes. Call decorate_graph() first."
   )
@@ -186,6 +189,7 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
 
     pushback(qe, epath)
     pushback(qv, vpath)
+    pushback(qc, candidate_distances$cheated)
 
     bundles_crossed <- stats::na.omit(unique(edge_attr(pathfinder_graph, "pathfinder.bundle_id", index = epath)))
     # Any bundles crossed get added to the queue
