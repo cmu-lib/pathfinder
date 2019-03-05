@@ -27,6 +27,9 @@
 #'   `Inf` and thus forbid recrossing a bundle. Using [`penalize_inf`] can result
 #'   in an incomplete path. See [`penalize`] for guidance on supplying your own
 #'   function. Ignored if `penalize = FALSE`.
+#' @param cheat Boolean. If true, the search algorithm will temporarily treat
+#'   the graph as undirected if it gets trapped behind a one-way edge, and try
+#'   to restart its crawl.
 #' @param quiet Boolean. Display progress?
 #'
 #' @import assertthat
@@ -40,7 +43,7 @@
 #' crossed by the path
 #'
 #' @export
-greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, penalize = TRUE, penalty_fun = penalize_square, quiet = !interactive()) {
+greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, penalize = TRUE, penalty_fun = penalize_square, cheat = FALSE, quiet = !interactive()) {
   pathfinder_graph <- decorate_graph(graph, edge_bundles, distances)
   assert_that(is.count(starting_point))
   assert_that(starting_point %in% seq_len(vcount(pathfinder_graph)), msg = "starting_point must be an index of a vertex in graph")
@@ -67,6 +70,7 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
     is_bundle_crossing = is_edge_bundle,
     penalize = penalize,
     penalty_fun = penalty_fun,
+    cheat = cheat,
     quiet = quiet
   )
 
@@ -128,7 +132,7 @@ greedy_search <- function(graph, edge_bundles, distances, starting_point = 1, pe
 # until it can find no further paths to take.
 #
 #' @import igraph dequer
-greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, penalize, penalty_fun, quiet) {
+greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, qe, qv, qb, is_bundle_crossing, penalize, penalty_fun, cheat, quiet) {
   assertthat::assert_that(inherits(pathfinder_graph, "pathfinder_graph"),
     msg = "graph must be decorated with pathfinder attributes. Call decorate_graph() first."
   )
@@ -155,7 +159,7 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
     # Report on status
     step_status_message(quiet, starting_point, search_set, is_bundle_crossing, bundle_id)
 
-    candidate_distances <- get_candidate_distances(pathfinder_graph, starting_point, candidate_points, candidate_edges, is_bundle_crossing)
+    candidate_distances <- get_candidate_distances(pathfinder_graph, starting_point, candidate_points, candidate_edges, is_bundle_crossing, cheat)
 
     if (all(is.infinite(candidate_distances$candidate_distances))) {
       warning("Not all points reachable. Stopped early.\n")
@@ -173,7 +177,7 @@ greedy_search_handler <- function(pathfinder_graph, starting_point, search_set, 
       )
     }
 
-    possible_paths <- get_possible_paths(pathfinder_graph, candidate_distances$candidate_distances, candidate_distances$bundle_graph, starting_point, candidate_points, candidate_edges, is_bundle_crossing)
+    possible_paths <- get_possible_paths(pathfinder_graph, candidate_distances$candidate_distances, candidate_distances$bundle_graph, starting_point, candidate_points, candidate_edges, is_bundle_crossing, candidate_distances$cheated)
 
     if (!is.null(possible_paths$break_reason)) return(possible_paths)
 
@@ -266,26 +270,44 @@ get_candidate_points <- function(pathfinder_graph, starting_point, search_set, i
   )
 }
 
-get_candidate_distances <- function(pathfinder_graph, starting_point, candidate_points, candidate_edges, is_bundle_crossing) {
+get_candidate_distances <- function(pathfinder_graph, starting_point, candidate_points, candidate_edges, is_bundle_crossing, cheat) {
+  cheated <- FALSE
+
   if (is_bundle_crossing) {
     bundle_graph <- subgraph.edges(pathfinder_graph, eids = candidate_edges, delete.vertices = FALSE)
     candidate_distances <- distances(bundle_graph, v = starting_point, to = candidate_points, mode = "out", weights = edge_attr(bundle_graph, "pathfinder.distance"))
+
+    if (all(is.infinite(candidate_distances)) & cheat) {
+      candidate_distances <- distances(bundle_graph, v = starting_point, to = candidate_points, mode = "all", weights = edge_attr(bundle_graph, "pathfinder.distance"))
+      cheated <- TRUE
+    }
   } else {
     bundle_graph <- NULL
     candidate_distances <- distances(pathfinder_graph,
-      v = starting_point, to = candidate_points, mode = "out",
-      weights = edge_attr(pathfinder_graph, "pathfinder.distance")
+                                     v = starting_point, to = candidate_points, mode = "out",
+                                     weights = edge_attr(pathfinder_graph, "pathfinder.distance")
     )
+
+    if (all(is.infinite(candidate_distances)) & cheat) {
+      candidate_distances <- distances(pathfinder_graph,
+                                       v = starting_point, to = candidate_points, mode = "all",
+                                       weights = edge_attr(pathfinder_graph, "pathfinder.distance")
+      )
+      cheated <- TRUE
+    }
   }
 
   list(
     candidate_distances = candidate_distances,
-    bundle_graph = bundle_graph
+    bundle_graph = bundle_graph,
+    cheated = cheated
   )
 }
 
-get_possible_paths <- function(pathfinder_graph, candidate_distances, bundle_graph, starting_point, candidate_points, candidate_edges, is_bundle_crossing) {
+get_possible_paths <- function(pathfinder_graph, candidate_distances, bundle_graph, starting_point, candidate_points, candidate_edges, is_bundle_crossing, cheated) {
   assertthat::assert_that(!is.null(candidate_distances))
+
+  pathing_mode <- if (cheated) "all" else "out"
 
   if (is_bundle_crossing) {
     # Find a path within the subgraph comprising only that bundle
@@ -296,7 +318,7 @@ get_possible_paths <- function(pathfinder_graph, candidate_distances, bundle_gra
       possible_paths <- shortest_paths(
         bundle_graph,
         from = starting_point, to = target_point,
-        mode = "out", output = "both",
+        mode = pathing_mode, output = "both",
         weights = edge_attr(bundle_graph, "pathfinder.distance")
       )
     })
@@ -306,7 +328,7 @@ get_possible_paths <- function(pathfinder_graph, candidate_distances, bundle_gra
     suppressWarnings({
       possible_paths <- shortest_paths(pathfinder_graph,
         from = starting_point, to = target_point,
-        weights = edge_attr(pathfinder_graph, "pathfinder.distance"), output = "both", mode = "out"
+        weights = edge_attr(pathfinder_graph, "pathfinder.distance"), output = "both", mode = pathing_mode
       )
     })
   }

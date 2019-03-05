@@ -5,7 +5,7 @@
 \title{Greedy search for bundled edges}
 \usage{
 greedy_search(graph, edge_bundles, distances, starting_point = 1,
-  penalize = TRUE, penalty_fun = penalize_square,
+  penalize = TRUE, penalty_fun = penalize_square, cheat = FALSE,
   quiet = !interactive())
 }
 \arguments{
@@ -30,6 +30,10 @@ bundle any time at least one edge in that bundle is traversed. Defaults to
 \code{Inf} and thus forbid recrossing a bundle. Using \code{\link{penalize_inf}} can result
 in an incomplete path. See \code{\link{penalize}} for guidance on supplying your own
 function. Ignored if \code{penalize = FALSE}.}
+
+\item{cheat}{Boolean. If true, the search algorithm will temporarily treat
+the graph as undirected if it gets trapped behind a one-way edge, and try
+to restart its crawl.}
 
 \item{quiet}{Boolean. Display progress?}
 }
