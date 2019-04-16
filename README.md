@@ -81,7 +81,7 @@ penalized_run <- greedy_search(pgh_graph,
                                penalize = TRUE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.svg" width="100%" />
 
 It’s also possible to supply penalty functions that will completely
 prohibit recrossing edge bundles, however this may result in incomplete
@@ -101,21 +101,34 @@ resulting pathways at different levels of resolution.
 
 ``` r
 augment(penalized_run)
-#> # A tibble: 160 x 6
-#> # Groups:   edge_id [?]
-#>    index step_id edge_id bundle_id times_edge_crossed times_bundle_crossed
-#>    <int>   <int>   <int>     <int>              <int>                <int>
-#>  1     1       1       2        NA                  1                   NA
-#>  2     2       1     542        NA                  1                   NA
-#>  3     3       1     879        NA                  1                   NA
-#>  4     4       1    2678        NA                  1                   NA
-#>  5     5       1    2166        NA                  1                   NA
-#>  6     6       1    2949        NA                  1                   NA
-#>  7     7       1    5232        NA                  1                   NA
-#>  8     8       1     330        NA                  1                   NA
-#>  9     9       1    2473        NA                  1                   NA
-#> 10    10       1    4139        NA                  1                   NA
-#> # … with 150 more rows
+#> # A tibble: 160 x 7
+#> # Groups:   edge_id [148]
+#>    index step_id edge_id bundle_id cheated_path times_edge_cros…
+#>    <int>   <int>   <int>     <int> <lgl>                   <int>
+#>  1     1       1       2        NA FALSE                       1
+#>  2     2       1     542        NA FALSE                       1
+#>  3     3       1     879        NA FALSE                       1
+#>  4     4       1    2678        NA FALSE                       1
+#>  5     5       1    2166        NA FALSE                       1
+#>  6     6       1    2949        NA FALSE                       1
+#>  7     7       1    5232        NA FALSE                       1
+#>  8     8       1     330        NA FALSE                       1
+#>  9     9       1    2473        NA FALSE                       1
+#> 10    10       1    4139        NA FALSE                       1
+#> # … with 150 more rows, and 1 more variable: times_bundle_crossed <int>
 ```
 
 For more info, see `?glance`, `?tidy`, `?augment`
+
+## Context
+
+This package is one of several originally developed by [Matthew
+Lincoln](https://github.com/mdlincoln) for use by Carnegie Mellon
+University’s [“Bridges of Pittsburgh”](http://bridgesofpittsburgh.net/)
+project:
+
+  - [konigsberger](https://dsharp-cmu.github.io/konigsbergr/index.html)
+    (end-user package)
+      - [pathfinder](https://github.com/dSHARP-CMU/pathfinder/)
+      - [bigosm](https://github.com/dSHARP-CMU/bigosm)
+      - [simplygraph](https://github.com/dSHARP-CMU/simplygraph)

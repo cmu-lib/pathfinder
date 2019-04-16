@@ -9,7 +9,8 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  dev = "svg"
 )
 
 options("max.print" = 20)
@@ -97,3 +98,21 @@ augment(penalized_run)
 ```
 
 For more info, see `?glance`, `?tidy`, `?augment`
+
+## Context
+
+This package is one of several originally developed by [Matthew Lincoln](https://github.com/mdlincoln) for use by Carnegie Mellon University's ["Bridges of Pittsburgh"](http://bridgesofpittsburgh.net/) project:
+
+- [konigsberger] (end-user package)
+  - [pathfinder]
+  - [bigosm]
+  - [simplygraph]
+
+[konigsberger]: https://dsharp-cmu.github.io/konigsbergr/index.html
+
+[pathfinder]: https://github.com/dSHARP-CMU/pathfinder/
+
+[simplygraph]: https://github.com/dSHARP-CMU/simplygraph
+
+[bigosm]: https://github.com/dSHARP-CMU/bigosm
+
