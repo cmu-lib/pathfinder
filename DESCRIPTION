@@ -1,6 +1,6 @@
 Type: Package
 Package: pathfinder
-Title: Greedy Search For Graph Edge Bundles
+Title: Topology Navigation And Manipulation Functions
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Matthew",
@@ -22,12 +22,17 @@ Imports:
     dplyr,
     glue,
     magrittr,
+    Matrix,
+    progress,
     tibble
 Suggests: 
     covr,
-    testthat
+    testthat,
+    knitr,
+    rmarkdown
 Encoding: UTF-8
 Language: en-US
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 6.1.1
+VignetteBuilder: knitr

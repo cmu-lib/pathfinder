@@ -1,0 +1,52 @@
+---
+title: "Simplifying Graphs"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{simplifying-graphs}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+Say you have a graph where multiple nodes could be removed while still maintaining the same intersections between paths:
+
+```{r build, message=FALSE}
+set.seed(100)
+library(igraph)
+library(pathfinder)
+
+graph <- igraph::graph_from_edgelist(
+  matrix(c(
+    "a", "b",
+    "b", "f",
+    "b", "d",
+    "d", "c",
+    "d", "e",
+    "e", "k",
+    "j", "k",
+    "f", "g",
+    "c", "h",
+    "h", "i",
+    "f", "j"
+  ), ncol = 2, byrow = TRUE),
+  directed = FALSE
+)
+
+edge_attr(graph, "distance") <- sample(1:10, size = ecount(graph), replace = TRUE)
+
+plot(graph, edge.label = edge_attr(graph, "distance"))
+```
+
+Nodes `j`, `k`, `e`, `c`, and `h` could be removed without fundamentally altering the relationship of path intersections in this graph. `simplify_topology()` finds those 2-degree nodes and removes them, rewiring the remaining tangent nodes. Edge attributes will be merged with functions passed by the user via `edge_attr_comb`.
+
+```{r simplify, message=FALSE}
+simple_graph <- simplify_topology(graph, edge_attr_comb = list(distance = sum))
+
+plot(simple_graph, edge.label = edge_attr(simple_graph, "distance"))
+```
