@@ -45,22 +45,6 @@ glance <- function(pathway) {
   )
 }
 
-#' Returns a tidy data frame with one row per edge bundle
-#'
-#' @param pathway A `pathfinder_results` object from, e.g. [`greedy_search`].
-#'
-#' @return A [tibble::tibble] with the following columns
-#'   - `bundle_id`
-#'   - `times_crossed`
-#'
-#' @export
-tidy <- function(pathway) {
-  assertthat::assert_that(inherits(pathway, "pathfinder_path"))
-
-  bundle_cross_count(pathway$bpath)
-}
-
-
 #' Returns a tidy data frame with one row per edge in the original graph
 #'
 #' @param pathway A `pathfinder_results` object from, e.g. [`greedy_search`].
@@ -105,7 +89,7 @@ augment_edges <- function(pathway) {
 #' @importFrom dplyr filter mutate group_by ungroup select lag row_number distinct left_join
 #' @import magrittr
 #' @export
-augment <- function(pathway) {
+augment_path <- function(pathway) {
   assertthat::assert_that(inherits(pathway, "pathfinder_path"))
 
   all_edges <- unlist(pathway$epath)
