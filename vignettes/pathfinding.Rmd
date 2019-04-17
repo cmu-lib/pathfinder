@@ -14,13 +14,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r, include = FALSE}
+```{r library, include = FALSE}
 library(pathfinder)
 ```
 
 Starting with an igraph object, specify edge bundles that must be traversed by using a list of edge indices:
 
-```{r}
+```{r data}
 # A small subset of road data from Pittsburgh
 pgh_graph
 
@@ -33,30 +33,33 @@ pgh_bundles
 `greedy_search()` will traverse the graph by walking a path from the starting vertex to the nearest edge bundle, crossing that bundle, then finding the next closest bundle, until all bundles have been crossed at least once.
 By setting `penalize = TRUE` you can add a severe edge weight penalty to crossed bundles to discourage crossing bundles more than once.
 
-```{r}
+```{r penalized-run}
 penalized_run <- greedy_search(pgh_graph, 
                                edge_bundles = pgh_bundles, 
                                distances = pgh_distances, 
                                penalize = TRUE)
 ```
 
-```{r, eval=FALSE, echo=FALSE, warning=FALSE}
-suppressPackageStartupMessages({
-  library(konigsbergr)
-  library(sf)
-})
-
+```{r pathway-plot}
 render_pathway_plot <- function(graph, bundles, distances, pathway) {
   plot_graph <- decorate_graph(graph, bundles, distances)
-  E(plot_graph)$edge_mark[unique_pathway_edges(pathway)] <- "path"
-  E(plot_graph)$edge_mark[which(!is.na(E(plot_graph)$pathfinder.bundle_id))] <- "bundled"
   
-  graph_sf <- edges_to_sf(plot_graph)
-  penalized_augment <- augment(penalized_run)
-  penalized_solution <- graph_sf[unique(penalized_augment$edge_id),]
+  plot_layout <- cbind(
+    V(plot_graph)$lon,
+    V(plot_graph)$lat
+  )
   
-  plot(st_geometry(graph_sf), col = "gray80", reset = FALSE)
-  plot(penalized_solution["edge_mark"], pal = c(path = "blue", bundled = "red"), lwd = 2, add = TRUE)
+  pathway_augmented <- augment_edges(pathway)
+  edge_status <- ifelse(pathway_augmented$times_edge_crossed > 0, ifelse(is.na(pathway_augmented$bundle_id), "path", "bundled"), "none")
+  
+  plot(plot_graph, 
+       vertex.size = 0.1, 
+       vertex.label = NA, 
+       edge.label = NA, 
+       curved = FALSE, 
+       edge.arrow.mode = 0,
+       edge.color = c(path = "blue", bundled = "red", none = "gray80")[edge_status],
+       edge.width = c(path = 2, bundled = 3, none = 0.2)[edge_status])
 }
 
 render_pathway_plot(pgh_graph, pgh_bundles, pgh_distances, penalized_run)
@@ -64,17 +67,19 @@ render_pathway_plot(pgh_graph, pgh_bundles, pgh_distances, penalized_run)
 
 It's also possible to supply penalty functions that will completely prohibit recrossing edge bundles, however this may result in incomplete paths that get trapped.
 
-```{r}
+```{r stopped-pathway}
 infinite_run <- greedy_search(pgh_graph, 
                               edge_bundles = pgh_bundles, 
                               distances = pgh_distances, 
                               penalize = TRUE, 
                               penalty_fun = penalize_inf)
+
+render_pathway_plot(pgh_graph, pgh_bundles, pgh_distances, infinite_run)
 ```
 
 Tidying methods are also available to get summary statistics on resulting pathways at different levels of resolution. 
 
-```{r}
+```{r augment}
 augment(penalized_run)
 ```
 

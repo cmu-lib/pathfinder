@@ -60,6 +60,34 @@ tidy <- function(pathway) {
   bundle_cross_count(pathway$bpath)
 }
 
+
+#' Returns a tidy data frame with one row per edge in the original graph
+#'
+#' @param pathway A `pathfinder_results` object from, e.g. [`greedy_search`].
+#'
+#' @return A [tibble::tibble] with the following columns:
+#'   - `edge_id` edge index in original graph
+#'   - `bundle_id` Bundle id for this edge if it belonged to one
+#'   - `times_edge_crossed` Total times this edge was crossed by the path
+#' @import magrittr
+#' @export
+augment_edges <- function(pathway) {
+  assertthat::assert_that(inherits(pathway, "pathfinder_path"))
+
+  all_edges <- unlist(pathway$epath)
+  bundled_edges <- get_bundled_edges(pathway$edge_bundles)
+  total_edges <- ecount(pathway$graph_state)
+
+  edge_id <- seq_len(total_edges)
+  bundle_id <- attr(bundled_edges, "pathfinder.bundle_ids")[match(edge_id, bundled_edges)]
+  times_edge_crossed <- vapply(edge_id, function(eid) sum(all_edges == eid), FUN.VALUE = integer(1))
+
+  tibble::tibble(
+    edge_id,
+    bundle_id,
+    times_edge_crossed)
+}
+
 #' Returns a tidy data frame with one row per edge crossing
 #'
 #' @param pathway A `pathfinder_results` object from, e.g. [`greedy_search`].
