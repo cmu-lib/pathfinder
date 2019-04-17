@@ -69,6 +69,7 @@ tidy <- function(pathway) {
 #'   - `edge_id` edge index in original graph
 #'   - `bundle_id` Bundle id for this edge if it belonged to one
 #'   - `times_edge_crossed` Total times this edge was crossed by the path
+#'   - `edge_type` Factor. Type of edge on the path: `path`, `bundled`, or `none`
 #' @import magrittr
 #' @export
 augment_edges <- function(pathway) {
@@ -81,11 +82,13 @@ augment_edges <- function(pathway) {
   edge_id <- seq_len(total_edges)
   bundle_id <- attr(bundled_edges, "pathfinder.bundle_ids")[match(edge_id, bundled_edges)]
   times_edge_crossed <- vapply(edge_id, function(eid) sum(all_edges == eid), FUN.VALUE = integer(1))
+  edge_type <- factor(ifelse(times_edge_crossed > 0, ifelse(is.na(bundle_id), "path", "bundled"), "none"), levels = c("path", "bundled", "none"))
 
   tibble::tibble(
     edge_id,
     bundle_id,
-    times_edge_crossed)
+    times_edge_crossed,
+    edge_type)
 }
 
 #' Returns a tidy data frame with one row per edge crossing

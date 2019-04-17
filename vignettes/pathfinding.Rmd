@@ -44,22 +44,23 @@ penalized_run <- greedy_search(pgh_graph,
 render_pathway_plot <- function(graph, bundles, distances, pathway) {
   plot_graph <- decorate_graph(graph, bundles, distances)
   
+  # In this case we're looking at 
   plot_layout <- cbind(
     V(plot_graph)$lon,
     V(plot_graph)$lat
   )
   
   pathway_augmented <- augment_edges(pathway)
-  edge_status <- ifelse(pathway_augmented$times_edge_crossed > 0, ifelse(is.na(pathway_augmented$bundle_id), "path", "bundled"), "none")
   
   plot(plot_graph, 
+       layout = plot_layout,
        vertex.size = 0.1, 
        vertex.label = NA, 
        edge.label = NA, 
        curved = FALSE, 
        edge.arrow.mode = 0,
-       edge.color = c(path = "blue", bundled = "red", none = "gray80")[edge_status],
-       edge.width = c(path = 2, bundled = 3, none = 0.2)[edge_status])
+       edge.color = c(path = "blue", bundled = "red", none = "gray80")[pathway_augmented$edge_type],
+       edge.width = c(path = 2, bundled = 3, none = 0.2)[pathway_augmented$edge_type])
 }
 
 render_pathway_plot(pgh_graph, pgh_bundles, pgh_distances, penalized_run)

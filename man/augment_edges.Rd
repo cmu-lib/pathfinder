@@ -15,6 +15,7 @@ A \link[tibble:tibble]{tibble::tibble} with the following columns:
 \item \code{edge_id} edge index in original graph
 \item \code{bundle_id} Bundle id for this edge if it belonged to one
 \item \code{times_edge_crossed} Total times this edge was crossed by the path
+\item \code{edge_type} Factor. Type of edge on the path: \code{path}, \code{bundled}, or \code{none}
 }
 }
 \description{
