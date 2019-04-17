@@ -1,6 +1,7 @@
 ---
 title: "Simplifying Graphs"
 output: rmarkdown::html_vignette
+author: "Matthew Lincoln"
 vignette: >
   %\VignetteIndexEntry{simplifying-graphs}
   %\VignetteEngine{knitr::rmarkdown}

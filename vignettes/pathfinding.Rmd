@@ -1,6 +1,7 @@
 ---
 title: "Pathfinding"
 output: rmarkdown::html_vignette
+author: "Matthew Lincoln"
 vignette: >
   %\VignetteIndexEntry{Pathfinding}
   %\VignetteEngine{knitr::rmarkdown}
