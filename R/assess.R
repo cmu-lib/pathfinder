@@ -12,8 +12,10 @@
 #'   - `bundle_most_crossed` Bundle id with the highest number of crossings.
 #'   - `p_multiple_crossed` Proportion of bundles crossed more than once.
 #'
+#' @seealso [augment_edges()] and [augment_path()].
+#'
 #' @export
-glance <- function(pathway) {
+glance_path <- function(pathway) {
   assertthat::assert_that(inherits(pathway, "pathfinder_path"))
 
   starting_point <- pathway$starting_point
@@ -56,6 +58,7 @@ glance <- function(pathway) {
 #'   - `edge_type` Factor. Type of edge on the path: `path`, `bundled`, or `none`
 #' @import magrittr
 #' @export
+#' @seealso [glance_path()] and [augment_path()].
 augment_edges <- function(pathway) {
   assertthat::assert_that(inherits(pathway, "pathfinder_path"))
 
@@ -89,6 +92,7 @@ augment_edges <- function(pathway) {
 #' @importFrom dplyr filter mutate group_by ungroup select lag row_number distinct left_join
 #' @import magrittr
 #' @export
+#' @seealso [glance_path()] and [augment_edges()].
 augment_path <- function(pathway) {
   assertthat::assert_that(inherits(pathway, "pathfinder_path"))
 
@@ -132,7 +136,7 @@ bundle_cross_count <- function(bpath) {
 
 #' Get pathway data
 #'
-#' @inheritParams glance
+#' @inheritParams glance_path
 #' @name pathway
 NULL
 

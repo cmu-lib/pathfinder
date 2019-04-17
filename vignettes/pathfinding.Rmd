@@ -78,10 +78,22 @@ infinite_run <- greedy_search(pgh_graph,
 render_pathway_plot(pgh_graph, pgh_bundles, pgh_distances, infinite_run)
 ```
 
-Tidying methods are also available to get summary statistics on resulting pathways at different levels of resolution. 
+Tidying methods are also available to get summary statistics on resulting pathways at different levels of resolution:
 
-```{r augment}
-augment(penalized_run)
+One line per pathway:
+
+```{r glance}
+glance_path(penalized_run)
 ```
 
-For more info, see `?glance`, `?tidy`, `?augment`
+One line per edge in the graph
+
+```{r augment-edges}
+augment_edges(penalized_run)
+```
+
+Or one line per edge crossed in the path (may)
+
+```{r augment-path}
+augment_path(penalized_run)
+```

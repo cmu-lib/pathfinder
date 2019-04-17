@@ -2,7 +2,7 @@ context("test-assess")
 
 test_that("asseessment functions return data frames", {
   pathway <- greedy_search(pgh_graph, pgh_bundles, pgh_distances, quiet = TRUE)
-  test_glance <- glance(pathway)
+  test_glance <- glance_path(pathway)
   test_augment_edges <- augment_edges(pathway)
   test_augment_path <- augment_path(pathway)
 

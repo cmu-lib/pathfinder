@@ -21,3 +21,6 @@ A \link[tibble:tibble]{tibble::tibble} with the following columns:
 \description{
 Returns a tidy data frame with one row per edge in the original graph
 }
+\seealso{
+\code{\link[=glance_path]{glance_path()}} and \code{\link[=augment_path]{augment_path()}}.
+}

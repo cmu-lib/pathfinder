@@ -23,3 +23,6 @@ A \link[tibble:tibble]{tibble::tibble} with the following columns:
 \description{
 Returns a tidy data frame with one row per edge crossing
 }
+\seealso{
+\code{\link[=glance_path]{glance_path()}} and \code{\link[=augment_edges]{augment_edges()}}.
+}
