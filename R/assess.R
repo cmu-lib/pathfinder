@@ -99,12 +99,9 @@ augment_path <- function(pathway) {
   all_edges <- unlist(pathway$epath)
   step_id <- unlist(mapply(function(e, i) rep(i, times = length(e)), pathway$epath, seq_along(pathway$epath)))
   cheated_path <- unlist(mapply(function(e, ch) rep(ch, times = length(e)), pathway$epath, pathway$cheated))
-  bundled_edges <- get_bundled_edges(pathway$edge_bundles)
-
-
   index <- seq_along(all_edges)
   edge_id <- all_edges
-  bundle_id <- attr(bundled_edges, "pathfinder.bundle_ids")[match(all_edges, bundled_edges)]
+  bundle_id <- edge_attr(pathway[["graph_state"]], "pathfinder.bundle_id", index = edge_id)
 
   res <- tibble::tibble(
     index,

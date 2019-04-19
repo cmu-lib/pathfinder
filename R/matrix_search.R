@@ -1,13 +1,23 @@
 # Matrix-search ----
 
-matrix_search <- function(graph, starting_point = 1, progress = interactive()) {
+#' Greedy search using precomputed matrices
+#'
+#' @param graph A graph
+#' @param starting_point Integer. Starting vertex
+#'
+#' @export
+matrix_search <- function(graph, starting_point = 1) {
   stopifnot(inherits(graph, "pathfinder_graph"))
   message("Pre-calculating distance matrices...", appendLF = FALSE)
 
-  no_bundle_graph <- delete_edges(graph, which(!is.na(edge_attr(graph, "pathfinder.bundle_id"))))
-  bundle_only_graph <- delete_edges(graph, which(is.na(edge_attr(graph, "pathfinder.bundle_id"))))
+  bridge_indices <- which(!is.na(edge_attr(graph, "pathfinder.bundle_id")))
+  non_bridge_indices <- which(is.na(edge_attr(graph, "pathfinder.bundle_id")))
+  no_bundle_graph <- delete_edges(graph, bridge_indices)
+  bundle_only_graph <- delete_edges(graph, non_bridge_indices)
 
-  #lookup_table <- node_sibling_lookup(graph)
+
+  edge_attr(graph, "pathfinder.distance", bridge_indices) <- 1e20
+
 
   message("full matrix...", appendLF = FALSE)
   full_matrix <- general_distance_matrix(graph)
@@ -24,10 +34,11 @@ matrix_search <- function(graph, starting_point = 1, progress = interactive()) {
   valid_targets <- rowSums(bundle_only_matrix, na.rm = TRUE) > 0 & colSums(no_bundle_matrix, na.rm = TRUE) > 0
   points_to_visit[!valid_targets] <- FALSE
 
+  lookup_table <- node_sibling_lookup(graph)
   starting_point <- get_nearest_bridge_point(graph, points_to_visit, starting_point)
 
   message("Running greedy search...", appendLF = FALSE)
-  step_list <- matrix_loop(full_matrix, bundle_only_matrix, no_bundle_matrix, points_to_visit, starting_point)
+  step_list <- matrix_loop(full_matrix, bundle_only_matrix, no_bundle_matrix, points_to_visit, lookup_table, starting_point)
   message("done.")
 
   message("Extrapolating full paths...", appendLF = TRUE)
@@ -38,8 +49,9 @@ matrix_search <- function(graph, starting_point = 1, progress = interactive()) {
     epath = full_path[["epath"]],
     bpath = full_path[["bpath"]],
     step_types = vapply(step_list, function(x) x[["step"]], FUN.VALUE = character(1)),
-    starting_point = head(step_list, 1)[["from"]],
-    ending_point = tail(step_list, 1)[["to"]],
+    starting_point = as.integer(head(step_list, 1)[[1]][["from"]]),
+    ending_point = as.integer(tail(step_list, 1)[[1]][["to"]]),
+    cheated = vapply(step_list, function(x) x[["step"]] == "cheat", FUN.VALUE = logical(1)),
     graph_state = graph
   ), class = "pathfinder_path")
 
@@ -48,19 +60,21 @@ matrix_search <- function(graph, starting_point = 1, progress = interactive()) {
 
 #' @importFrom dequer queue pushback
 #' @noRd
-matrix_loop <- function(full_matrix, bundle_only_matrix, no_bundle_matrix, points_to_visit, starting_point) {
+matrix_loop <- function(full_matrix, bundle_only_matrix, no_bundle_matrix, points_to_visit, lookup_table, starting_point) {
   q <- queue()
 
   while (sum(points_to_visit) > 1) {
+    points_to_visit[lookup_table[[starting_point]]] <- FALSE
+
     # CROSS BUNDLE ----
-
-    # Get all nodes that belong to the starting point's bridge
-    b <- colnames(bundle_only_matrix)[!is.na(bundle_only_matrix)[starting_point,]]
-    points_to_visit[b] <- FALSE
-
     # message("Considering points ", paste0(b, collapse = "; "))
     intra_bridge_dist <- bundle_only_matrix[starting_point, ]
-    target <- which(intra_bridge_dist == max(intra_bridge_dist, na.rm = TRUE))
+
+    # Any reachable nodes should be considered part of the bridge, and thus crossed
+    b <- names(which(!is.na(intra_bridge_dist)))
+    points_to_visit[b] <- FALSE
+
+    target <- which.max(intra_bridge_dist)
     if (length(target) >= 1) {
       # proceed as normal
       global_from <- starting_point
@@ -175,14 +189,15 @@ hydrate_path <- function(graph, bundle_only_graph, no_bundle_graph, step_list) {
 #'
 #' @noRd
 node_sibling_lookup <- function(graph) {
-  interface_points <- which(vertex_attr(graph, "pathfinder.interface"))
+  interface_points <- as.character(which(vertex_attr(graph, "pathfinder.interface")))
+  vertex_names <- vertex_attr(graph, "name")
+  edf <- as_data_frame(graph, what = "edges")
+  sliced_edf <- split(edf, f = as.factor(edf$pathfinder.bundle_id))
+  bundle_points <- lapply(sliced_edf, function(df) unique(c(df[["from"]], df[["to"]])))
+  bundle_indices <- lapply(bundle_points, function(pids) which(vertex_names %in% pids))
+
   res <- lapply(interface_points, function(vi) {
-    incidents <- incident(graph, v = vi, mode = "all")
-    bundle_ids <- unique(na.omit(edge_attr(graph, "pathfinder.bundle_id", incidents)))
-    bundle_edges <- which(edge_attr(graph, "pathfinder.bundle_id") %in% bundle_ids)
-    bundle_nodes <- ends(graph, es = bundle_edges, names = FALSE)
-    bundle_termini <- bundle_nodes[which(vertex_attr(graph, "pathfinder.interface", bundle_nodes))]
-    as.character(unique(bundle_termini))
+     intersect(interface_points, as.character(unique(unlist(lapply(bundle_indices, function(bps) if (vi %in% bps) bps), recursive = TRUE))))
   })
   names(res) <- interface_points
   res
