@@ -4,11 +4,13 @@
 #'
 #' @param graph A graph
 #' @param starting_point Integer. Starting vertex
+#' @param cheat Logical. Allow recrossing bundles?
+#' @param quiet Logical. Display messages?
 #'
-#' @export
-matrix_search <- function(graph, starting_point = 1) {
+#' @noRd
+matrix_search <- function(graph, starting_point = 1, cheat, quiet) {
   stopifnot(inherits(graph, "pathfinder_graph"))
-  message("Pre-calculating distance matrices...", appendLF = FALSE)
+  if (!quiet) message("Pre-calculating distance matrices...", appendLF = FALSE)
 
   bridge_indices <- which(!is.na(edge_attr(graph, "pathfinder.bundle_id")))
   non_bridge_indices <- which(is.na(edge_attr(graph, "pathfinder.bundle_id")))
@@ -20,13 +22,13 @@ matrix_search <- function(graph, starting_point = 1) {
   stopifnot(all(E(no_bundle_graph)$pathfinder.edge_id %in% E(graph)$pathfinder.edge_id))
   stopifnot(!all(E(bundle_only_graph)$pathfinder.edge_id %in% E(no_bundle_graph)$pathfinder.edge_id))
 
-  message("full matrix...", appendLF = FALSE)
+  if (!quiet) message("full matrix...", appendLF = FALSE)
   full_matrix <- general_distance_matrix(graph)
-  message("inter-bundle matrix...", appendLF = FALSE)
+  if (!quiet) message("inter-bundle matrix...", appendLF = FALSE)
   no_bundle_matrix <- general_distance_matrix(no_bundle_graph)
-  message("intra-bundle matrix...", appendLF = FALSE)
+  if (!quiet) message("intra-bundle matrix...", appendLF = FALSE)
   bundle_only_matrix <- general_distance_matrix(bundle_only_graph)
-  message("done.")
+  if (!quiet) message("done.")
 
   points_to_visit <- !logical(nrow(bundle_only_matrix))
   names(points_to_visit) <- rownames(bundle_only_matrix)
@@ -37,37 +39,48 @@ matrix_search <- function(graph, starting_point = 1) {
 
   lookup_table <- node_sibling_lookup(graph)
   stopifnot(all(vapply(lookup_table, length, FUN.VALUE = integer(1)) >= 1))
-  starting_point <- get_nearest_bridge_point(graph, points_to_visit, starting_point)
+  bridge_starting_point <- get_nearest_bridge_point(graph, points_to_visit, starting_point)
 
-  message("Running greedy search...", appendLF = FALSE)
-  step_list <- matrix_loop(full_matrix, bundle_only_matrix, no_bundle_matrix, points_to_visit, lookup_table, starting_point)
-  validate_steplist(step_list)
-  message("done.")
+  if (!quiet) message("Running greedy search...", appendLF = FALSE)
+  step_list <- matrix_loop(full_matrix, bundle_only_matrix, no_bundle_matrix, points_to_visit, lookup_table, bridge_starting_point, starting_point, cheat)
+  validate_steplist(step_list$steps)
+  if (!quiet) message("done.")
 
-  message("Extrapolating full paths...", appendLF = TRUE)
-  full_path <- hydrate_path(graph, bundle_only_graph, no_bundle_graph, step_list)
-  message("done.")
+  if (!quiet) message("Extrapolating full paths...", appendLF = TRUE)
+  full_path <- hydrate_path(graph, bundle_only_graph, no_bundle_graph, step_list$steps)
+  if (!quiet) message("done.")
 
   pathway <- structure(list(
     epath = full_path[["epath"]],
     bpath = full_path[["bpath"]],
-    step_types = vapply(step_list, function(x) x[["step"]], FUN.VALUE = character(1)),
-    starting_point = as.integer(head(step_list, 1)[[1]][["from"]]),
-    ending_point = as.integer(tail(step_list, 1)[[1]][["to"]]),
-    cheated = vapply(step_list, function(x) x[["step"]] == "cheat", FUN.VALUE = logical(1)),
+    step_types = vapply(step_list$steps, function(x) x[["step"]], FUN.VALUE = character(1)),
+    starting_point = starting_point,
+    ending_point = as.integer(tail(step_list$steps, 1)[[1]][["to"]]),
+    cheated = vapply(step_list$steps, function(x) x[["step"]] == "cheat", FUN.VALUE = logical(1)),
     graph_state = graph,
     distances = E(graph)$pathfinder.distance,
-    step_list = step_list
+    step_list = step_list$steps,
+    path_is_complete = step_list$complete
   ), class = "pathfinder_path")
 
   pathway
 }
 
 #' @importFrom dequer queue pushback
+#' @importFrom stats na.omit
+#' @importFrom utils tail
 #' @noRd
-matrix_loop <- function(full_matrix, bundle_only_matrix, no_bundle_matrix, points_to_visit, lookup_table, starting_point) {
+matrix_loop <- function(full_matrix, bundle_only_matrix, no_bundle_matrix, points_to_visit, lookup_table, starting_point, specified_starting_point, cheat) {
   q <- queue()
-
+  if (specified_starting_point != starting_point) {
+    path_step <- list(
+      from = specified_starting_point,
+      to = starting_point,
+      step = "road"
+    )
+    pushback(q, path_step)
+  }
+  path_complete <- TRUE
   while (sum(points_to_visit) > 1) {
     stopifnot(is.character(starting_point))
     points_to_visit[lookup_table[[starting_point]]] <- FALSE
@@ -110,6 +123,10 @@ matrix_loop <- function(full_matrix, bundle_only_matrix, no_bundle_matrix, point
         step = "road"
       )
     } else {
+      if (!cheat) {
+        path_complete <- FALSE
+        break
+      }
       # If none are available, cheat and find a new start point pathing via the full matrix
       starting_point <- names(which.min(full_matrix[global_from, points_to_visit]))
 
@@ -129,7 +146,12 @@ matrix_loop <- function(full_matrix, bundle_only_matrix, no_bundle_matrix, point
     if (sum(points_to_visit) == 0) break
   }
 
-  return(as.list(q))
+
+  return(
+    list(
+      steps = as.list(q),
+      complete = path_complete)
+  )
 }
 
 get_nearest_bridge_point <- function(graph, points_to_visit, starting_point) {
@@ -211,7 +233,7 @@ hydrate_path <- function(graph, bundle_only_graph, no_bundle_graph, step_list) {
 #' @noRd
 node_sibling_lookup <- function(graph) {
   interface_points <- as.character(which(vertex_attr(graph, "pathfinder.interface")))
-  vertex_names <- as.character(V(graph))
+  vertex_names <- as.character(V(graph)$name)
   edf <- as_data_frame(graph, what = "edges")
   sliced_edf <- split(edf, f = as.factor(edf$pathfinder.bundle_id))
   bundle_points <- lapply(sliced_edf, function(df) unique(c(df[["from"]], df[["to"]])))

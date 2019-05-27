@@ -5,8 +5,7 @@
 \title{Greedy search for bundled edges}
 \usage{
 greedy_search(graph, edge_bundles, distances, starting_point = 1,
-  penalize = TRUE, penalty_fun = penalize_square, cheat = FALSE,
-  quiet = !interactive())
+  cheat = TRUE, quiet = !interactive())
 }
 \arguments{
 \item{graph}{An \code{\link{igraph}} object.}
@@ -21,16 +20,6 @@ distances of each edge.}
 \item{starting_point}{Integer. Index of the point from which to start the
 search.}
 
-\item{penalize}{Boolean. Penalize the edge distance of already-crossed
-bundles to discourage crossing the same bundles more than once?}
-
-\item{penalty_fun}{A function to penalize the weights of all edges in a
-bundle any time at least one edge in that bundle is traversed. Defaults to
-\code{\link{penalize_square}}, however can be set to \code{\link{penalize_inf}} to set weight to
-\code{Inf} and thus forbid recrossing a bundle. Using \code{\link{penalize_inf}} can result
-in an incomplete path. See \code{\link{penalize}} for guidance on supplying your own
-function. Ignored if \code{penalize = FALSE}.}
-
 \item{cheat}{Boolean. If true, the search algorithm will temporarily treat
 the graph as undirected if it gets trapped behind a one-way edge, and try
 to restart its crawl.}
@@ -41,8 +30,6 @@ to restart its crawl.}
 A \code{pathfinder_path} object, which is a list with the following elements:
 \itemize{
 \item \code{epath}: A list of integer vectors representing the successive edges
-crossed by the path
-\item \code{vpath}: A list of integer vectors representing the successive vertices
 crossed by the path
 \item \code{bpath}: A list of integer vectors representing the successive edge bundles
 crossed by the path
