@@ -12,12 +12,13 @@ matrix_search <- function(graph, starting_point = 1) {
 
   bridge_indices <- which(!is.na(edge_attr(graph, "pathfinder.bundle_id")))
   non_bridge_indices <- which(is.na(edge_attr(graph, "pathfinder.bundle_id")))
-  no_bundle_graph <- delete_edges(graph, bridge_indices)
-  bundle_only_graph <- delete_edges(graph, non_bridge_indices)
+  stopifnot(!any(bridge_indices %in% non_bridge_indices))
+  no_bundle_graph <- delete_edges(graph, E(graph)[bridge_indices])
+  bundle_only_graph <- delete_edges(graph, E(graph)[non_bridge_indices])
 
-
-  edge_attr(graph, "pathfinder.distance", bridge_indices) <- 1e20
-
+  stopifnot(all(E(bundle_only_graph)$pathfinder.edge_id %in% E(graph)$pathfinder.edge_id))
+  stopifnot(all(E(no_bundle_graph)$pathfinder.edge_id %in% E(graph)$pathfinder.edge_id))
+  stopifnot(!all(E(bundle_only_graph)$pathfinder.edge_id %in% E(no_bundle_graph)$pathfinder.edge_id))
 
   message("full matrix...", appendLF = FALSE)
   full_matrix <- general_distance_matrix(graph)
@@ -35,10 +36,12 @@ matrix_search <- function(graph, starting_point = 1) {
   points_to_visit[!valid_targets] <- FALSE
 
   lookup_table <- node_sibling_lookup(graph)
+  stopifnot(all(vapply(lookup_table, length, FUN.VALUE = integer(1)) >= 1))
   starting_point <- get_nearest_bridge_point(graph, points_to_visit, starting_point)
 
   message("Running greedy search...", appendLF = FALSE)
   step_list <- matrix_loop(full_matrix, bundle_only_matrix, no_bundle_matrix, points_to_visit, lookup_table, starting_point)
+  validate_steplist(step_list)
   message("done.")
 
   message("Extrapolating full paths...", appendLF = TRUE)
@@ -52,7 +55,9 @@ matrix_search <- function(graph, starting_point = 1) {
     starting_point = as.integer(head(step_list, 1)[[1]][["from"]]),
     ending_point = as.integer(tail(step_list, 1)[[1]][["to"]]),
     cheated = vapply(step_list, function(x) x[["step"]] == "cheat", FUN.VALUE = logical(1)),
-    graph_state = graph
+    graph_state = graph,
+    distances = E(graph)$pathfinder.distance,
+    step_list = step_list
   ), class = "pathfinder_path")
 
   pathway
@@ -64,10 +69,10 @@ matrix_loop <- function(full_matrix, bundle_only_matrix, no_bundle_matrix, point
   q <- queue()
 
   while (sum(points_to_visit) > 1) {
+    stopifnot(is.character(starting_point))
     points_to_visit[lookup_table[[starting_point]]] <- FALSE
 
     # CROSS BUNDLE ----
-    # message("Considering points ", paste0(b, collapse = "; "))
     intra_bridge_dist <- bundle_only_matrix[starting_point, ]
 
     # Any reachable nodes should be considered part of the bridge, and thus crossed
@@ -107,6 +112,10 @@ matrix_loop <- function(full_matrix, bundle_only_matrix, no_bundle_matrix, point
     } else {
       # If none are available, cheat and find a new start point pathing via the full matrix
       starting_point <- names(which.min(full_matrix[global_from, points_to_visit]))
+
+      # If there are no points left, then all have been visited and the search is done
+      if (length(starting_point) == 0) break
+
       path_step <- list(
         from = global_to,
         to = starting_point,
@@ -129,6 +138,16 @@ get_nearest_bridge_point <- function(graph, points_to_visit, starting_point) {
   names(working_points)[which.min(all_distances)]
 }
 
+validate_steplist <- function(step_list) {
+  for (s in seq_along(step_list)) {
+    this <- step_list[[s]]
+    if (s + 1 <= length(step_list)) {
+      that <- step_list[[s + 1]]
+      stopifnot(this$to == that$from)
+    }
+  }
+}
+
 #' From a sequence of from-to points, generate a list of steps containing edge indices
 #'
 #' @param graph The original full graph
@@ -142,28 +161,30 @@ hydrate_path <- function(graph, bundle_only_graph, no_bundle_graph, step_list) {
     s$from <- as.integer(s$from)
     s$to <- as.integer(s$to)
 
+    # if (length(s$to) == 0) {
+    #   return(integer(0))
+    # }
+
     if (s$step == "bridge") {
-
       p <- shortest_paths(bundle_only_graph, from = s$from, to = s$to, mode = "out",
-                          weights = edge_attr(bundle_only_graph, "pathfinder.distance"), output = "epath")
-      edge_attr(bundle_only_graph, "pathfinder.edge_id", p$epath[[1]])
-
+                          weights = edge_attr(bundle_only_graph, "pathfinder.distance"),
+                          output = "epath")
     } else if (s$step == "road") {
-
       p <- shortest_paths(no_bundle_graph, from = s$from, to = s$to, mode = "out",
-                          weights = edge_attr(no_bundle_graph, "pathfinder.distance"), output = "epath")
-      edge_attr(no_bundle_graph, "pathfinder.edge_id", p$epath[[1]])
-
+                          weights = edge_attr(no_bundle_graph, "pathfinder.distance"),
+                          output = "epath")
     } else if (s$step == "cheat") {
-
       p <- shortest_paths(graph, from = s$from, to = s$to, mode = "out",
-                          weights = edge_attr(graph, "pathfinder.distance"), output = "epath")
-      edge_attr(graph, "pathfinder.edge_id", p$epath[[1]])
-
+                          weights = edge_attr(graph, "pathfinder.distance"),
+                          output = "epath")
     } else {
       stop("Invalid step type.")
     }
+    p$epath[[1]]$pathfinder.edge_id
   })
+
+
+  # epath[map_int(epath, length) > 0]
 
   bundle_ids <- edge_attr(graph, "pathfinder.bundle_id")
   bpath <- lapply(epath, function(es) {
@@ -190,7 +211,7 @@ hydrate_path <- function(graph, bundle_only_graph, no_bundle_graph, step_list) {
 #' @noRd
 node_sibling_lookup <- function(graph) {
   interface_points <- as.character(which(vertex_attr(graph, "pathfinder.interface")))
-  vertex_names <- vertex_attr(graph, "name")
+  vertex_names <- as.character(V(graph))
   edf <- as_data_frame(graph, what = "edges")
   sliced_edf <- split(edf, f = as.factor(edf$pathfinder.bundle_id))
   bundle_points <- lapply(sliced_edf, function(df) unique(c(df[["from"]], df[["to"]])))
@@ -225,22 +246,5 @@ general_distance_matrix <- function(graph, lookup_table = NULL) {
       distance_matrix[exclusion_points, exclusion_points] <- NA_real_
     }
   }
-
-  # suppressWarnings({
-  #   paths <- parallel::mclapply(interface_points, function(x) {
-  #     shortest_paths(graph,
-  #                    from = x,
-  #                    to = interface_points,
-  #                    mode = "out", output = "epath",
-  #                    weights = E(graph)$pathfinder.distance)
-  #   }, mc.preschedule = TRUE, mc.cores = 8)
-  # })
-  #
-  # named_all_paths <- setNames(lapply(paths, function(x) {
-  #   setNames(lapply(x$epath, function(y) {
-  #     orig_edge_ids[as.integer(y)]
-  #   }), interface_points)
-  # }), interface_points)
-
   distance_matrix
 }
