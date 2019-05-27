@@ -233,7 +233,11 @@ hydrate_path <- function(graph, bundle_only_graph, no_bundle_graph, step_list) {
 #' @noRd
 node_sibling_lookup <- function(graph) {
   interface_points <- as.character(which(vertex_attr(graph, "pathfinder.interface")))
-  vertex_names <- as.character(V(graph)$name)
+  if ("name" %in% vertex_attr_names(graph)) {
+    vertex_names <- as.character(V(graph)$name)
+  } else {
+    vertex_names <- as.character(V(graph))
+  }
   edf <- as_data_frame(graph, what = "edges")
   sliced_edf <- split(edf, f = as.factor(edf$pathfinder.bundle_id))
   bundle_points <- lapply(sliced_edf, function(df) unique(c(df[["from"]], df[["to"]])))
