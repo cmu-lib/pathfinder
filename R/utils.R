@@ -1,28 +1,3 @@
-#' Edge weight penalty functions
-#'
-#' @param x Numeric. All edge distances from the graph
-#' @param i Integer. The edge indices whose penalized weights will be returned.
-#'
-#' @return Numeric the same length as `i`.
-#'
-#' @name penalize
-NULL
-
-#' @describeIn penalize Add a constant based on the total edge distance in the graph and then squares the result.
-#' @import assertthat
-#' @export
-penalize_square <- function(x, i) {
-  res <- ((x[i]) + 1000)^2
-  assert_that(all(is.finite(res)), msg = "All return values form penalize_square must be finite")
-  res
-}
-
-#' @describeIn penalize Make edge distances `Inf`
-#' @export
-penalize_inf <- function(x, i) {
-  rep(Inf, times = length(i))
-}
-
 get_bundled_edges <- function(edge_bundles) {
   res <- unlist(edge_bundles)
   bundle_ids <- unlist(mapply(rep, seq_along(edge_bundles), vapply(edge_bundles, length, FUN.VALUE = integer(1))))
