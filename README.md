@@ -4,9 +4,9 @@
 # pathfinder
 
 [![Travis build
-status](https://travis-ci.org/dSHARP-CMU/pathfinder.svg?branch=master)](https://travis-ci.org/dSHARP-CMU/pathfinder)
+status](https://travis-ci.org/cmu-lib/pathfinder.svg?branch=master)](https://travis-ci.org/cmu-lib/pathfinder)
 [![Coverage
-status](https://codecov.io/gh/dSHARP-CMU/pathfinder/branch/master/graph/badge.svg)](https://codecov.io/github/dSHARP-CMU/pathfinder?branch=master)
+status](https://codecov.io/gh/cmu-lib/pathfinder/branch/master/graph/badge.svg)](https://codecov.io/github/cmu-lib/pathfinder?branch=master)
 
 pathfinder provides functions for complex pathfinding within a graph and
 topology simplification functions.
@@ -17,7 +17,7 @@ You can install the development version:
 
 ``` r
 # install.packages("remotes")
-remotes::install_github("dSHARP-CMU/pathfinder")
+remotes::install_github("cmu-lib/pathfinder")
 ```
 
 ## Context
@@ -27,7 +27,7 @@ Lincoln](https://github.com/mdlincoln) for use by Carnegie Mellon
 University’s [“Bridges of Pittsburgh”](http://bridgesofpittsburgh.net/)
 project:
 
-  - [konigsberger](https://dsharp-cmu.github.io/konigsbergr/index.html)
+  - [konigsberger](https://cmu-lib.github.io/konigsbergr/index.html)
     (end-user package)
-      - [pathfinder](https://github.com/dSHARP-CMU/pathfinder/)
-      - [bigosm](https://github.com/dSHARP-CMU/bigosm)
+      - [pathfinder](https://github.com/cmu-lib/pathfinder/)
+      - [bigosm](https://github.com/cmu-lib/bigosm)

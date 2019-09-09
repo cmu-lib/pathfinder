@@ -11,8 +11,8 @@ Authors@R:
 Description: Perform a greedy search for a pathway through edge
     bundles in a graph.
 License: MIT + file LICENSE
-URL: https://github.com/dSHARP-CMU/pathfinder
-BugReports: https://github.com/dSHARP-CMU/pathfinder/issues
+URL: https://github.com/cmu-lib/pathfinder
+BugReports: https://github.com/cmu-lib/pathfinder/issues
 Depends: 
     igraph,
     R (>= 3.0.1)
